@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Game Show Quiz</title>
+  <title>Who whants to get a 5</title>
   <style>
     * {
       box-sizing: border-box;
@@ -67,6 +67,20 @@
       text-align: center;
       padding: 50px;
     }
+    /* START BUTTON STYLE UPDATED */
+    #start button {
+      background-color: #1e90ff;  /* solid blue */
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #start button:hover {
+      background-color: #0073e6; /* darker blue on hover */
+    }
     #resultText {
       font-size: 28px;
       margin-bottom: 10px;
@@ -84,7 +98,7 @@
   </style>
 </head>
 <body>
-  <h1>Game Show Quiz</h1>
+  <h1>Who wants to get a 5</h1>
 
   <div id="start">
     <button onclick="startGame()">Start Quiz</button>
