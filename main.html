@@ -17,9 +17,16 @@
       margin-bottom: 20px;
     }
     .answers button {
-      margin: 10px;
+      display: block;
+      margin: 10px auto;
       padding: 10px 20px;
       font-size: 18px;
+      width: 250px;
+      cursor: pointer;
+    }
+    #levelDisplay {
+      font-weight: bold;
+      margin-bottom: 20px;
     }
   </style>
 </head>
@@ -29,16 +36,18 @@
     <button onclick="startGame()">Start Quiz</button>
   </div>
   <div id="quiz">
+    <div id="levelDisplay"></div>
     <div id="question" class="question"></div>
     <div class="answers">
-      <button onclick="submitAnswer('A')">A</button>
-      <button onclick="submitAnswer('B')">B</button>
-      <button onclick="submitAnswer('C')">C</button>
-      <button onclick="submitAnswer('D')">D</button>
+      <button id="btnA" onclick="submitAnswer('A')"></button>
+      <button id="btnB" onclick="submitAnswer('B')"></button>
+      <button id="btnC" onclick="submitAnswer('C')"></button>
+      <button id="btnD" onclick="submitAnswer('D')"></button>
     </div>
   </div>
   <div id="result">
     <h2 id="resultText"></h2>
+    <p id="scoreText"></p>
     <button onclick="startGame()">Restart</button>
   </div>
 
@@ -47,7 +56,7 @@
       Animals: [
         { question: "What animal barks?", options: ["Cat", "Dog", "Fish", "Cow"], answer: "B" },
         { question: "Which animal has a long neck?", options: ["Elephant", "Lion", "Giraffe", "Tiger"], answer: "C" },
-        { question: "What animal lives in water?", options: ["Horse", "Dog", "Shark", "Rabbit"], answer: "C" }
+        { question: "Which animal lives on land?", options: ["Fish", "Shark", "Dog", "Whale"], answer: "C" }
       ],
       Sports: [
         { question: "What sport uses a bat?", options: ["Soccer", "Tennis", "Baseball", "Boxing"], answer: "C" },
@@ -97,13 +106,14 @@
 
     function showQuestion() {
       const q = selectedQuestions[current];
-      document.getElementById("question").innerHTML = `
-        ${q.question}<br><br>
-        A. ${q.options[0]}<br>
-        B. ${q.options[1]}<br>
-        C. ${q.options[2]}<br>
-        D. ${q.options[3]}
-      `;
+      document.getElementById("levelDisplay").textContent = `Level ${current + 1} of 5`;
+      document.getElementById("question").textContent = q.question;
+
+      // Update button text
+      document.getElementById("btnA").textContent = q.options[0];
+      document.getElementById("btnB").textContent = q.options[1];
+      document.getElementById("btnC").textContent = q.options[2];
+      document.getElementById("btnD").textContent = q.options[3];
     }
 
     function submitAnswer(letter) {
@@ -124,6 +134,9 @@
       document.getElementById("quiz").style.display = "none";
       document.getElementById("result").style.display = "block";
       document.getElementById("resultText").textContent = won ? "You Win!" : "You Lose!";
+      document.getElementById("scoreText").textContent = won
+        ? "You got all 5 correct!"
+        : `You got to level ${current + 1}`;
     }
   </script>
 </body>
