@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Quiz Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    #quiz, #result {
+      display: none;
+    }
+    .question {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .answers button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple Quiz Game</h1>
+  <div id="start">
+    <button onclick="startGame()">Start Quiz</button>
+  </div>
+  <div id="quiz">
+    <div id="question" class="question"></div>
+    <div class="answers">
+      <button onclick="submitAnswer('A')">A</button>
+      <button onclick="submitAnswer('B')">B</button>
+      <button onclick="submitAnswer('C')">C</button>
+      <button onclick="submitAnswer('D')">D</button>
+    </div>
+  </div>
+  <div id="result">
+    <h2 id="resultText"></h2>
+    <button onclick="startGame()">Restart</button>
+  </div>
+
+  <script>
+    const questions = {
+      Animals: [
+        { question: "What animal barks?", options: ["Cat", "Dog", "Fish", "Cow"], answer: "B" },
+        { question: "Which animal has a long neck?", options: ["Elephant", "Lion", "Giraffe", "Tiger"], answer: "C" },
+        { question: "What animal lives in water?", options: ["Horse", "Dog", "Shark", "Rabbit"], answer: "C" }
+      ],
+      Sports: [
+        { question: "What sport uses a bat?", options: ["Soccer", "Tennis", "Baseball", "Boxing"], answer: "C" },
+        { question: "What sport is played on ice?", options: ["Basketball", "Hockey", "Golf", "Cricket"], answer: "B" },
+        { question: "Which sport uses a goalpost?", options: ["Soccer", "Swimming", "Baseball", "Running"], answer: "A" }
+      ],
+      Math: [
+        { question: "What is 2 + 2?", options: ["3", "4", "5", "6"], answer: "B" },
+        { question: "What is 5 x 3?", options: ["15", "10", "8", "12"], answer: "A" },
+        { question: "What is 9 - 4?", options: ["5", "6", "3", "4"], answer: "A" }
+      ],
+      Movies: [
+        { question: "Who is the main character in Toy Story?", options: ["Buzz", "Woody", "Jessie", "Bo"], answer: "B" },
+        { question: "What movie is about a sinking ship?", options: ["Titanic", "Inception", "Frozen", "Jaws"], answer: "A" },
+        { question: "Which movie has a wizard?", options: ["Star Wars", "Avengers", "Harry Potter", "Cars"], answer: "C" }
+      ],
+      Tech: [
+        { question: "What does CPU stand for?", options: ["Central Unit", "Core Process Unit", "Central Processing Unit", "Computer Power Unit"], answer: "C" },
+        { question: "What company makes the iPhone?", options: ["Microsoft", "Google", "Apple", "Samsung"], answer: "C" },
+        { question: "Which is not a programming language?", options: ["Python", "HTML", "C++", "Google"], answer: "D" }
+      ]
+    };
+
+    let selectedQuestions = [];
+    let current = 0;
+
+    function startGame() {
+      document.getElementById("start").style.display = "none";
+      document.getElementById("result").style.display = "none";
+      document.getElementById("quiz").style.display = "block";
+
+      selectedQuestions = [
+        getRandomQuestion("Animals"),
+        getRandomQuestion("Sports"),
+        getRandomQuestion("Math"),
+        getRandomQuestion("Movies"),
+        getRandomQuestion("Tech")
+      ];
+      current = 0;
+      showQuestion();
+    }
+
+    function getRandomQuestion(category) {
+      const q = questions[category];
+      return q[Math.floor(Math.random() * q.length)];
+    }
+
+    function showQuestion() {
+      const q = selectedQuestions[current];
+      document.getElementById("question").innerHTML = `
+        ${q.question}<br><br>
+        A. ${q.options[0]}<br>
+        B. ${q.options[1]}<br>
+        C. ${q.options[2]}<br>
+        D. ${q.options[3]}
+      `;
+    }
+
+    function submitAnswer(letter) {
+      const correct = selectedQuestions[current].answer;
+      if (letter === correct) {
+        current++;
+        if (current >= selectedQuestions.length) {
+          endGame(true);
+        } else {
+          showQuestion();
+        }
+      } else {
+        endGame(false);
+      }
+    }
+
+    function endGame(won) {
+      document.getElementById("quiz").style.display = "none";
+      document.getElementById("result").style.display = "block";
+      document.getElementById("resultText").textContent = won ? "You Win!" : "You Lose!";
+    }
+  </script>
+</body>
+</html>
