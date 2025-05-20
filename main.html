@@ -1,218 +1,827 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Who whants to get a 5</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      background: #0a0a23; /* deep blue background */
-      color: #fff;
-    }
-    h1 {
-      margin: 20px 0;
-      text-align: center;
-    }
-    #quiz, #result {
-      flex: 1;
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    .question {
-      font-size: 24px;
-      margin-bottom: 20px;
-      text-align: center;
-      max-width: 90%;
-    }
-    #levelDisplay {
-      font-weight: bold;
-      margin-bottom: 20px;
-      font-size: 18px;
-    }
-    .answers {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      padding: 20px;
-      margin-top: auto;
-    }
-    .answers button {
-      padding: 18px;
-      font-size: 18px;
-      background: transparent;
-      color: white;
-      border: 2px solid #1e90ff;
-      border-radius: 8px;
-      transition: background 0.3s, color 0.3s;
-      cursor: pointer;
-      user-select: none;
-    }
-    .answers button:hover {
-      background: #1e90ff;
-      color: #000;
-    }
-    #start {
-      text-align: center;
-      padding: 50px;
-    }
-    /* START BUTTON STYLE UPDATED */
-    #start button {
-      background-color: #1e90ff;  /* solid blue */
-      color: white;
-      border: none;
-      padding: 15px 40px;
-      font-size: 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    #start button:hover {
-      background-color: #0073e6; /* darker blue on hover */
-    }
-    #resultText {
-      font-size: 28px;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-    #scoreText {
-      font-size: 20px;
-      margin-bottom: 20px;
-      white-space: pre-line;
-      text-align: center;
-    }
-    button {
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <h1>Who wants to get a 5</h1>
-
-  <div id="start">
-    <button onclick="startGame()">Start Quiz</button>
-  </div>
-
-  <div id="quiz">
-    <div id="levelDisplay"></div>
-    <div id="question" class="question"></div>
-    <div class="answers">
-      <button id="btnA" onclick="submitAnswer('A')"></button>
-      <button id="btnB" onclick="submitAnswer('B')"></button>
-      <button id="btnC" onclick="submitAnswer('C')"></button>
-      <button id="btnD" onclick="submitAnswer('D')"></button>
-    </div>
-  </div>
-
-  <div id="result">
-    <h2 id="resultText"></h2>
-    <p id="scoreText"></p>
-    <button onclick="startGame()">Restart</button>
-  </div>
-
-  <script>
-    const questions = {
-      Animals: [
-        { question: "Which animal lives on land?", options: ["Fish", "Shark", "Dog", "Whale"], answer: "C" },
-        { question: "What animal barks?", options: ["Cat", "Dog", "Fish", "Cow"], answer: "B" },
-        { question: "Which animal has a long neck?", options: ["Elephant", "Lion", "Giraffe", "Tiger"], answer: "C" }
-      ],
-      Sports: [
-        { question: "What sport uses a bat?", options: ["Soccer", "Tennis", "Baseball", "Boxing"], answer: "C" },
-        { question: "What sport is played on ice?", options: ["Basketball", "Hockey", "Golf", "Cricket"], answer: "B" },
-        { question: "Which sport uses a goalpost?", options: ["Soccer", "Swimming", "Baseball", "Running"], answer: "A" }
-      ],
-      Math: [
-        { question: "What is 2 + 2?", options: ["3", "4", "5", "6"], answer: "B" },
-        { question: "What is 5 x 3?", options: ["15", "10", "8", "12"], answer: "A" },
-        { question: "What is 9 - 4?", options: ["5", "6", "3", "4"], answer: "A" }
-      ],
-      Movies: [
-        { question: "Who is the main character in Toy Story?", options: ["Buzz", "Woody", "Jessie", "Bo"], answer: "B" },
-        { question: "What movie is about a sinking ship?", options: ["Titanic", "Inception", "Frozen", "Jaws"], answer: "A" },
-        { question: "Which movie has a wizard?", options: ["Star Wars", "Avengers", "Harry Potter", "Cars"], answer: "C" }
-      ],
-      Tech: [
-        { question: "What does CPU stand for?", options: ["Central Unit", "Core Process Unit", "Central Processing Unit", "Computer Power Unit"], answer: "C" },
-        { question: "What company makes the iPhone?", options: ["Microsoft", "Google", "Apple", "Samsung"], answer: "C" },
-        { question: "Which is not a programming language?", options: ["Python", "HTML", "C++", "Google"], answer: "D" }
-      ]
-    };
-
-    let selectedQuestions = [];
-    let current = 0;
-    let lastCorrectText = "";
-
-    function startGame() {
-      document.getElementById("start").style.display = "none";
-      document.getElementById("result").style.display = "none";
-      document.getElementById("quiz").style.display = "flex";
-
-      selectedQuestions = [
-        getRandomQuestion("Animals"),
-        getRandomQuestion("Sports"),
-        getRandomQuestion("Math"),
-        getRandomQuestion("Movies"),
-        getRandomQuestion("Tech")
-      ];
-      current = 0;
-      lastCorrectText = "";
-      showQuestion();
-    }
-
-    function getRandomQuestion(category) {
-      const q = questions[category];
-      return q[Math.floor(Math.random() * q.length)];
-    }
-
-    function showQuestion() {
-      const q = selectedQuestions[current];
-      document.getElementById("levelDisplay").textContent = `Level ${current + 1} of 5`;
-      document.getElementById("question").textContent = q.question;
-
-      document.getElementById("btnA").textContent = "A. " + q.options[0];
-      document.getElementById("btnB").textContent = "B. " + q.options[1];
-      document.getElementById("btnC").textContent = "C. " + q.options[2];
-      document.getElementById("btnD").textContent = "D. " + q.options[3];
-    }
-
-    function submitAnswer(letter) {
-      const q = selectedQuestions[current];
-      const correct = q.answer;
-      const correctText = q.options[["A", "B", "C", "D"].indexOf(correct)];
-
-      if (letter === correct) {
-        current++;
-        if (current >= selectedQuestions.length) {
-          endGame(true);
-        } else {
-          showQuestion();
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Who Wants To Get A 5?</title>
+     <script src="https://cdn.tailwindcss.com"></script>
+     <style>
+         body {
+             font-family: 'Brush Script MT', cursive;
+             scrollbar-width: thin;
+             scrollbar-color: #FFD700 #1E293B;
+         }
+         ::-webkit-scrollbar {
+             width: 8px;
+         }
+         ::-webkit-scrollbar-track {
+             background: #1E293B;
+         }
+         ::-webkit-scrollbar-thumb {
+             background-color: #FFD700;
+             border-radius: 10px;
+             border: 2px solid #1E293B;
+         }
+         .game-btn, .lifeline-btn, .option-btn, #start-game-btn, #play-again-btn, #walk-away-btn, .modal-btn, #add-question-dev-btn {
+             transition: all 0.2s ease-in-out;
+             border: 2px solid transparent;
+         }
+         .game-btn:hover:not(:disabled), .lifeline-btn:hover:not(:disabled), .option-btn:hover:not(:disabled),
+         #start-game-btn:hover, #play-again-btn:hover, #walk-away-btn:hover, .modal-btn:hover, #add-question-dev-btn:hover {
+             transform: scale(1.05);
+             box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+         }
+         .option-btn.selected { /* Player's current selection before locking */
+             background-color: #F59E0B; /* Amber-500 */
+             color: #1E293B;
+             border-color: #FFD700;
+         }
+         .option-btn.locked { /* Player's answer is locked in, ready for checking */
+            background-color: #D97706; /* Amber-600 */
+            color: white;
+            border-color: #FBBF24; /* Amber-400 */
+         }
+         .option-btn.correct {
+             background-color: #10B981 !important; /* Emerald-500 */
+             color: white !important;
+             animation: flash-correct 0.8s ease-in-out;
+         }
+         .option-btn.incorrect {
+             background-color: #EF4444 !important; /* Red-500 */
+             color: white !important;
+             animation: shake-incorrect 0.5s ease-in-out;
+         }
+         @keyframes flash-correct {
+             0%, 100% { opacity: 1; transform: scale(1); }
+             50% { opacity: 0.7; transform: scale(1.05); background-color: #34D399; }
+         }
+         @keyframes shake-incorrect {
+             0%, 100% { transform: translateX(0); }
+             20%, 60% { transform: translateX(-5px); }
+             40%, 80% { transform: translateX(5px); }
+         }
+         #prize-ladder li.current-level {
+             background-color: #F59E0B;
+             color: #1E293B;
+             font-weight: bold;
+             padding: 4px 8px;
+             border-radius: 4px;
+         }
+         #prize-ladder li.safe-haven {
+             color: #A7F3D0;
+             font-weight: bold;
+         }
+         .modal {
+             background-color: rgba(0,0,0,0.7);
+         }
+         #add-question-dev-btn {
+             background-color: #7c3aed;
+             color: white;
+         }
+         #add-question-dev-btn:hover {
+             background-color: #6d28d9;
+         }
+        .question-modal {
+            background-color: rgba(0,0,0,0.8);
+            z-index: 100;
         }
-      } else {
-        lastCorrectText = correct + ". " + correctText;
-        endGame(false);
-      }
-    }
+        .question-modal-content {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid #FFD700;
+        }
+        .question-modal-content label { display: block; margin-top: 10px; margin-bottom: 5px; color: #fde047; }
+        .question-modal-content input[type="text"], .question-modal-content select {
+            width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 4px;
+            background-color: #334155; border: 1px solid #475569; color: #e2e8f0;
+        }
+        .question-modal-content button { margin-top:15px; margin-right:10px; }
+        .nav-button-container button { margin-left: 5px; margin-right: 5px;}
+     </style>
+ </head>
+ <body class="bg-slate-900 text-gray-100">
 
-    function endGame(won) {
-      document.getElementById("quiz").style.display = "none";
-      document.getElementById("result").style.display = "flex";
-      document.getElementById("resultText").textContent = won ? "You Win!" : "You Lose!";
-      document.getElementById("scoreText").textContent = won
-        ? "You got all 5 correct!"
-        : `You got to level ${current + 1}\nCorrect answer: ${lastCorrectText}`;
-    }
-  </script>
-</body>
-</html>
+     <audio id="sound-start" src="sounds/start_game.mp3" preload="auto"></audio>
+     <audio id="sound-question" src="sounds/new_question.mp3" preload="auto"></audio>
+     <audio id="sound-final-answer-tick" src="sounds/final_answer_tick.mp3" preload="auto" loop></audio>
+     <audio id="sound-correct" src="sounds/correct_answer.mp3" preload="auto"></audio>
+     <audio id="sound-incorrect" src="sounds/incorrect_answer.mp3" preload="auto"></audio>
+     <audio id="sound-lifeline" src="sounds/lifeline.mp3" preload="auto"></audio>
+     <audio id="sound-win" src="sounds/win_million.mp3" preload="auto"></audio>
+     <audio id="sound-walk-away" src="sounds/walk_away.mp3" preload="auto"></audio>
+     <audio id="sound-game-over" src="sounds/game_over_lose.mp3" preload="auto"></audio>
+
+     <div id="game-container" class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4">
+
+         <div id="start-screen" class="text-center">
+             <img src="https://raw.githubusercontent.com/rshortbull/plsmshaniafigivemeanaincalc/refs/heads/main/Screenshot_2025-05-19_5.01.49_PM-removebg-preview.pngp" alt="Millionaire Game Logo" class="mx-auto mb-8 rounded-lg shadow-lg border-2 border-yellow-400"
+                  onerror="this.onerror=null; this.src='https://placehold.co/300x150/1E293B/FFD700?text=Game+Logo&font=press-start-2p';">
+             <h1 class="text-3xl sm:text-4xl md:text-5xl mb-8 text-yellow-400 tracking-wider">Who Wants To Get A 5?</h1>
+             <button id="start-game-btn" class="game-btn bg-yellow-500 hover:bg-yellow-600 text-slate-800 font-bold py-3 px-6 rounded-lg shadow-xl text-xl sm:text-2xl">Start Exam</button>
+             <button id="add-question-dev-btn" class="game-btn font-bold py-3 px-6 rounded-lg shadow-xl text-lg sm:text-xl mt-6">Too easy... I'll make my own questions</button>
+              <p class="mt-10 text-xs sm:text-sm text-slate-400 max-w-lg mx-auto text-justify leading-relaxed">
+                  Welcome, AP Calculus BC examinees. To select your response, please click once to highlight your chosen answer. A second click will securely lock your selection, 
+                  ensuring it is recorded accurately. Finally, a third click submits your answer for grading. 
+                  Please proceed carefully and deliberately, as precision is key to your success.
+              </p>
+
+         </div>
+
+         <div id="game-screen" class="hidden w-full max-w-6xl">
+             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                 <div class="lg:col-span-3 flex flex-col items-center space-y-3 order-2 lg:order-1 p-2 bg-slate-800 rounded-lg shadow-md">
+                     <h2 class="text-lg sm:text-xl mb-2 text-yellow-400">Lifelines</h2>
+                     <button id="lifeline-5050" class="lifeline-btn w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-md disabled:opacity-40 disabled:cursor-not-allowed shadow-md">50/50</button>
+                     <button id="lifeline-phone" class="lifeline-btn w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-md disabled:opacity-40 disabled:cursor-not-allowed shadow-md">Phone-A-Friend</button>
+                     <button id="lifeline-audience" class="lifeline-btn w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-md disabled:opacity-40 disabled:cursor-not-allowed shadow-md">Ask The Audience</button>
+                     <div id="audience-poll-container" class="hidden w-full mt-3 p-2 bg-slate-700 rounded-md text-xs">
+                         <h3 class="text-sm text-yellow-300 mb-1">Audience Poll:</h3>
+                         <div id="audience-poll-results"></div>
+                     </div>
+                     <div id="phone-a-friend-text" class="hidden w-full mt-3 p-3 bg-slate-700 rounded-md text-sm text-center text-yellow-200"></div>
+                     <button id="walk-away-btn" class="game-btn w-full mt-6 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg shadow-md">Walk Away</button>
+                 </div>
+
+                 <div class="lg:col-span-6 order-1 lg:order-2 flex flex-col items-center p-2">
+                     <div class="flex justify-between w-full items-center mb-2 px-1">
+                         <div id="question-number" class="text-sm sm:text-base text-yellow-400">Question X / 15</div>
+                         <div id="current-prize" class="text-lg sm:text-xl md:text-2xl text-green-400 font-bold">$0</div> <div id="earned-prize" class="text-sm sm:text-base text-yellow-300 font-bold">Earned: $0</div> </div>
+                     <div id="question-text-container" class="bg-slate-800 p-4 sm:p-6 rounded-lg shadow-xl text-center text-base sm:text-lg mb-4 sm:mb-6 min-h-[100px] sm:min-h-[120px] flex items-center justify-center w-full border-2 border-blue-500">
+                         <p id="question-text">Question will appear here.</p>
+                     </div>
+                     <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
+                         <button data-index="0" class="option-btn bg-blue-600 hover:bg-blue-700 p-3 sm:p-4 rounded-md text-left text-sm sm:text-base shadow-md">A: Option 1</button>
+                         <button data-index="1" class="option-btn bg-blue-600 hover:bg-blue-700 p-3 sm:p-4 rounded-md text-left text-sm sm:text-base shadow-md">B: Option 2</button>
+                         <button data-index="2" class="option-btn bg-blue-600 hover:bg-blue-700 p-3 sm:p-4 rounded-md text-left text-sm sm:text-base shadow-md">C: Option 3</button>
+                         <button data-index="3" class="option-btn bg-blue-600 hover:bg-blue-700 p-3 sm:p-4 rounded-md text-left text-sm sm:text-base shadow-md">D: Option 4</button>
+                     </div>
+                     <div id="control-buttons-container" class="mt-6 w-full flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-3">
+                        <button id="check-answer-btn" class="game-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hidden">Check My Answer</button>
+                     </div>
+                     <div id="navigation-buttons-container" class="mt-4 w-full flex justify-between items-center nav-button-container">
+                        <button id="prev-q-nav-btn" class="game-btn bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow-md">&lt;&lt; Previous</button>
+                        <button id="next-q-nav-btn" class="game-btn bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow-md">Next &gt;&gt;</button>
+                    </div>
+                 </div>
+
+                 <div class="lg:col-span-3 order-3 lg:order-3 p-2 bg-slate-800 rounded-lg shadow-md">
+                     <h2 class="text-lg sm:text-xl mb-2 text-yellow-400 text-center">Prize Ladder</h2>
+                     <ul id="prize-ladder" class="space-y-1 text-xs sm:text-sm text-right pr-2 max-h-[400px] sm:max-h-[500px] overflow-y-auto"></ul>
+                 </div>
+             </div>
+         </div>
+
+         <div id="game-over-screen" class="hidden text-center p-4">
+             <h2 id="game-over-title" class="text-3xl sm:text-4xl mb-4 text-yellow-400">Game Over!</h2>
+             <p id="final-winnings" class="text-xl sm:text-2xl mb-6">You won: $0</p>
+             <p id="game-over-message" class="text-base sm:text-lg mb-6 text-slate-300"></p>
+             <button id="play-again-btn" class="game-btn bg-yellow-500 hover:bg-yellow-600 text-slate-800 font-bold py-3 px-6 rounded-lg text-xl sm:text-2xl shadow-xl">Play Again</button>
+         </div>
+
+         <div id="final-answer-modal" class="fixed inset-0 modal items-center justify-center p-4 hidden z-50">
+             <div class="bg-slate-800 p-6 sm:p-8 rounded-lg shadow-2xl max-w-sm mx-auto text-center border-2 border-yellow-400">
+                 <p id="modal-question-text" class="text-lg sm:text-xl mb-6 text-yellow-300">Lock in this answer?</p> <div class="flex justify-around">
+                     <button id="confirm-lock-in-btn" class="modal-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-5 sm:py-3 sm:px-6 rounded-md text-base sm:text-lg">Yes, Lock In</button> <button id="cancel-lock-in-btn" class="modal-btn bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-5 sm:py-3 sm:px-6 rounded-md text-base sm:text-lg">No, Cancel</button> </div>
+             </div>
+         </div>
+     </div>
+
+    <div id="add-question-modal" class="fixed inset-0 question-modal items-center justify-center p-4 hidden z-60">
+        <div class="question-modal-content">
+            <h2 class="text-2xl text-yellow-400 mb-4">Add New Question</h2>
+            <form id="add-question-form">
+                <label for="new-question-text">Question:</label>
+                <input type="text" id="new-question-text" name="question" required>
+                <label for="new-option-a">Option A:</label> <input type="text" id="new-option-a" name="optionA" required>
+                <label for="new-option-b">Option B:</label> <input type="text" id="new-option-b" name="optionB" required>
+                <label for="new-option-c">Option C:</label> <input type="text" id="new-option-c" name="optionC" required>
+                <label for="new-option-d">Option D:</label> <input type="text" id="new-option-d" name="optionD" required>
+                <label for="new-correct-answer">Correct Answer:</label>
+                <select id="new-correct-answer" name="correctAnswer" required>
+                    <option value="0">Option A</option> <option value="1">Option B</option>
+                    <option value="2">Option C</option> <option value="3">Option D</option>
+                </select>
+                <button type="submit" class="modal-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-5 rounded-md">Save Question</button>
+                <button type="button" id="cancel-add-question-btn" class="modal-btn bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-5 rounded-md">Cancel</button>
+            </form>
+            <p class="mt-4 text-xs text-slate-400">Note: Adds question for current session. For permanent changes, edit source.</p>
+        </div>
+    </div>
+
+     <script>
+         // ------------- GAME DATA AND CONFIGURATION ------------- //
+         let questions = [
+             { question: "What is the capital of France?", options: ["Berlin", "Madrid", "Paris", "Rome"], correctAnswer: 2, answered: false, correct: null },
+             { question: "Which planet is known as the Red Planet?", options: ["Earth", "Mars", "Jupiter", "Venus"], correctAnswer: 1, answered: false, correct: null },
+             { question: "What is 2 + 2 * 2?", options: ["8", "6", "4", "10"], correctAnswer: 1, answered: false, correct: null },
+             // Add 'answered: false, correct: null' to all your questions
+             // For brevity, I'll assume you update the rest of your questions array like this
+             { question: "What is the largest ocean on Earth?", options: ["Atlantic", "Indian", "Arctic", "Pacific"], correctAnswer: 3, answered: false, correct: null },
+             { question: "Who wrote 'Romeo and Juliet'?", options: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"], correctAnswer: 1, answered: false, correct: null },
+             { question: "Which country is home to the kangaroo?", options: ["South Africa", "Australia", "India", "Brazil"], correctAnswer: 1, answered: false, correct: null },
+             { question: "What is the currency of Japan?", options: ["Won", "Yuan", "Yen", "Dollar"], correctAnswer: 2, answered: false, correct: null },
+             { question: "How many continents are there?", options: ["5", "6", "7", "8"], correctAnswer: 2, answered: false, correct: null },
+             { question: "What is the hardest natural substance on Earth?", options: ["Gold", "Iron", "Diamond", "Quartz"], correctAnswer: 2, answered: false, correct: null },
+             { question: "Who painted the Mona Lisa?", options: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Claude Monet"], correctAnswer: 2, answered: false, correct: null },
+             { question: "In which year did World War II end?", options: ["1942", "1945", "1948", "1950"], correctAnswer: 1, answered: false, correct: null },
+             { question: "What is the chemical symbol for water?", options: ["O2", "CO2", "H2O", "NaCl"], correctAnswer: 2, answered: false, correct: null },
+             { question: "Which Apollo mission first landed humans on the Moon?", options: ["Apollo 9", "Apollo 11", "Apollo 13", "Apollo 15"], correctAnswer: 1, answered: false, correct: null },
+             { question: "What is the main ingredient in guacamole?", options: ["Tomato", "Onion", "Avocado", "Pepper"], correctAnswer: 2, answered: false, correct: null },
+             { question: "Who is the all-time top scorer in NBA history?", options: ["Michael Jordan", "Kobe Bryant", "LeBron James", "Kareem Abdul-Jabbar"], correctAnswer: 2, answered: false, correct: null }
+         ];
+
+         const prizeMoney = [
+             1,2,3,4,5
+         ];
+         const safeHavensIndices = []; // $1000, $32000, $1M
+
+         // ------------- DOM ELEMENTS ------------- //
+         const startScreen = document.getElementById('start-screen');
+         const gameScreen = document.getElementById('game-screen');
+         const gameOverScreen = document.getElementById('game-over-screen');
+         const startGameBtn = document.getElementById('start-game-btn');
+         const playAgainBtn = document.getElementById('play-again-btn');
+         const walkAwayBtn = document.getElementById('walk-away-btn');
+         const questionNumberEl = document.getElementById('question-number');
+         const currentPrizeEl = document.getElementById('current-prize'); // Shows potential prize for current Q
+         const earnedPrizeEl = document.getElementById('earned-prize');   // ADDED: Shows actual earned prize
+         const questionTextEl = document.getElementById('question-text');
+         const optionsGrid = document.getElementById('options-grid');
+         const optionBtns = optionsGrid.querySelectorAll('.option-btn');
+         const prizeLadderEl = document.getElementById('prize-ladder');
+         const lifeline5050Btn = document.getElementById('lifeline-5050');
+         const lifelinePhoneBtn = document.getElementById('lifeline-phone');
+         const lifelineAudienceBtn = document.getElementById('lifeline-audience');
+         const audiencePollContainer = document.getElementById('audience-poll-container');
+         const audiencePollResultsEl = document.getElementById('audience-poll-results');
+         const phoneAFriendTextEl = document.getElementById('phone-a-friend-text');
+         const finalAnswerModal = document.getElementById('final-answer-modal');
+         const modalQuestionTextEl = document.getElementById('modal-question-text');
+         const confirmLockInBtn = document.getElementById('confirm-lock-in-btn'); // MODIFIED ID
+         const cancelLockInBtn = document.getElementById('cancel-lock-in-btn');   // MODIFIED ID
+         const gameOverTitleEl = document.getElementById('game-over-title');
+         const finalWinningsEl = document.getElementById('final-winnings');
+         const gameOverMessageEl = document.getElementById('game-over-message');
+         const addQuestionDevBtn = document.getElementById('add-question-dev-btn');
+         const addQuestionModal = document.getElementById('add-question-modal');
+         const addQuestionForm = document.getElementById('add-question-form');
+         const cancelAddQuestionBtn = document.getElementById('cancel-add-question-btn');
+
+         // ADDED: Control and Navigation Buttons
+         const checkAnswerBtn = document.getElementById('check-answer-btn');
+         const prevQNavBtn = document.getElementById('prev-q-nav-btn');
+         const nextQNavBtn = document.getElementById('next-q-nav-btn');
+
+
+         // ------------- GAME STATE ------------- //
+         let currentQuestionIndex = 0;
+         let currentWinnings = 0; // Actual money won
+         let highestSafeHavenReached = 0; // Money from the last safe haven passed
+         let selectedAnswerIndex = -1; // Index of the currently visually selected answer
+         let lockedAnswerIndex = -1;   // Index of the answer locked-in by player
+         let answerIsLocked = false;   // Flag if current question's answer is locked
+         let gameIsOver = false;
+
+         let lifelines = { fiftyFifty: true, phoneAFriend: true, askTheAudience: true };
+         let activeSound = null;
+
+         // ------------- SOUND FUNCTIONS ------------- //
+         function playSound(soundId, loop = false) { /* ... (same as before) ... */ }
+         function stopSound(soundId) { /* ... (same as before) ... */ }
+         function stopAllSounds() { /* ... (same as before) ... */ }
+         // (Copy existing sound functions here if they were removed for brevity in prompt)
+         function playSound(soundId, loop = false) {
+            const sound = document.getElementById(soundId);
+            if (sound) {
+                if (activeSound && activeSound.loop) {
+                    activeSound.pause();
+                    activeSound.currentTime = 0;
+                }
+                sound.currentTime = 0;
+                sound.loop = loop;
+                sound.play().catch(e => console.error("Error playing sound:", e));
+                if (loop) activeSound = sound; else activeSound = null;
+            } else console.warn(`Sound with ID '${soundId}' not found.`);
+         }
+         function stopSound(soundId) {
+            const sound = document.getElementById(soundId);
+            if (sound) {
+                sound.pause(); sound.currentTime = 0;
+                if (activeSound === sound) activeSound = null;
+            }
+         }
+         function stopAllSounds() {
+            if (activeSound) {activeSound.pause(); activeSound.currentTime = 0; activeSound = null;}
+            // You might want to iterate all audio elements and stop them if managing multiple non-looping sounds.
+         }
+
+         // ------------- GAME LOGIC FUNCTIONS ------------- //
+         function formatCurrency(amount) { return amount.toLocaleString(); }
+
+         function initializePrizeLadder() {
+            // ... (same as before, ensures prize ladder is built) ...
+            prizeLadderEl.innerHTML = '';
+            prizeMoney.slice().reverse().forEach((amount, index) => {
+                const listItem = document.createElement('li');
+                const questionNum = prizeMoney.length - index;
+                listItem.textContent = `${questionNum}. ${formatCurrency(amount)}`;
+                listItem.dataset.level = prizeMoney.length - 1 - index;
+                const originalIndex = prizeMoney.length - 1 - index;
+                if (safeHavensIndices.includes(originalIndex) && originalIndex !== prizeMoney.length -1) {
+                    listItem.classList.add('safe-haven');
+                }
+                if (originalIndex === prizeMoney.length -1) {
+                    listItem.classList.add('text-yellow-300', 'font-extrabold');
+                }
+                prizeLadderEl.appendChild(listItem);
+            });
+         }
+
+         function updatePrizeLadderHighlight() {
+            // ... (same as before, highlights current question's potential prize) ...
+            // This function highlights the *potential* prize for the current question being *viewed*.
+            // Actual winnings are tracked in `currentWinnings`.
+            document.querySelectorAll('#prize-ladder li').forEach(li => {
+                 li.classList.remove('current-level', 'text-slate-800');
+                 if (!li.classList.contains('safe-haven') && !li.classList.contains('text-yellow-300')) {
+                     li.classList.add('text-gray-100');
+                 }
+             });
+             if (currentQuestionIndex < prizeMoney.length) { // Check if currentQuestionIndex is within bounds
+                 const currentLevelEl = prizeLadderEl.querySelector(`li[data-level="${currentQuestionIndex}"]`);
+                 if (currentLevelEl) {
+                     currentLevelEl.classList.add('current-level');
+                     currentLevelEl.classList.remove('text-gray-100');
+                     currentLevelEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                 }
+             }
+         }
+
+        function updateNavigationAndControlButtons() {
+            const questionData = questions[currentQuestionIndex];
+
+            // Nav buttons
+            prevQNavBtn.disabled = currentQuestionIndex === 0;
+            nextQNavBtn.disabled = currentQuestionIndex === questions.length - 1;
+
+            // Check Answer button
+            if (answerIsLocked && !questionData.answered) {
+                checkAnswerBtn.classList.remove('hidden');
+                checkAnswerBtn.disabled = false;
+            } else {
+                checkAnswerBtn.classList.add('hidden');
+                checkAnswerBtn.disabled = true;
+            }
+
+            // Option buttons styling and disabled state
+            optionBtns.forEach((btn, index) => {
+                btn.disabled = answerIsLocked || questionData.answered; // Disable if answer locked OR question already answered
+                if (index === lockedAnswerIndex && answerIsLocked && !questionData.answered) {
+                    btn.classList.add('locked'); // Style for locked but not yet checked
+                } else {
+                    btn.classList.remove('locked');
+                }
+
+                if (questionData.answered) { // If question has been answered, show correct/incorrect
+                    if (index === questionData.correctAnswer) {
+                        btn.classList.add('correct');
+                    } else if (index === lockedAnswerIndex && !questionData.correct) { // Show their incorrect locked choice
+                        btn.classList.add('incorrect');
+                    }
+                }
+            });
+
+            // Lifelines
+            lifeline5050Btn.disabled = !lifelines.fiftyFifty || answerIsLocked || questionData.answered;
+            lifelinePhoneBtn.disabled = !lifelines.phoneAFriend || answerIsLocked || questionData.answered;
+            lifelineAudienceBtn.disabled = !lifelines.askTheAudience || answerIsLocked || questionData.answered;
+        }
+
+
+         function resetOptionButtonsVisuals() { // Resets for new question or navigation
+             optionBtns.forEach(btn => {
+                 btn.classList.remove('selected', 'locked', 'correct', 'incorrect', 'opacity-50', 'cursor-not-allowed', 'bg-slate-500');
+                 btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                 btn.disabled = false;
+             });
+             audiencePollContainer.classList.add('hidden');
+             phoneAFriendTextEl.classList.add('hidden');
+         }
+
+         function displayQuestion() {
+            if (gameIsOver) return;
+            if (currentQuestionIndex < 0 || currentQuestionIndex >= questions.length) {
+                console.error("Invalid question index:", currentQuestionIndex);
+                return;
+            }
+
+            answerIsLocked = false; // Reset lock state for the new question
+            lockedAnswerIndex = -1; // Reset locked answer index
+            selectedAnswerIndex = -1; // Reset visual selection
+
+            resetOptionButtonsVisuals();
+            playSound('sound-question');
+
+            const q = questions[currentQuestionIndex];
+            questionTextEl.textContent = q.question;
+            questionNumberEl.textContent = `Question ${currentQuestionIndex + 1} / ${questions.length}`;
+            currentPrizeEl.textContent = formatCurrency(prizeMoney[currentQuestionIndex]); // Potential prize for this Q
+            earnedPrizeEl.textContent = `Earned: ${formatCurrency(currentWinnings)}`; // Actual earned
+
+            q.options.forEach((option, index) => {
+                optionBtns[index].innerHTML = `${String.fromCharCode(65 + index)}: ${option}`;
+            });
+
+            updatePrizeLadderHighlight();
+            updateNavigationAndControlButtons(); // Update button states based on new question
+         }
+
+         function handleOptionClick(event) {
+             if (answerIsLocked || questions[currentQuestionIndex].answered) return; // Don't allow change if locked or answered
+
+             // Remove 'selected' from previously selected button (if any)
+             if (selectedAnswerIndex !== -1 && optionBtns[selectedAnswerIndex]) {
+                 optionBtns[selectedAnswerIndex].classList.remove('selected');
+             }
+
+             selectedAnswerIndex = parseInt(event.target.closest('.option-btn').dataset.index);
+             optionBtns[selectedAnswerIndex].classList.add('selected');
+
+             // Open modal to confirm locking in
+             modalQuestionTextEl.innerHTML = `Lock in answer: <br><span class="text-white font-bold">${optionBtns[selectedAnswerIndex].textContent.substring(3)}</span>?`;
+             finalAnswerModal.classList.remove('hidden');
+             finalAnswerModal.classList.add('flex');
+             playSound('sound-final-answer-tick', true);
+         }
+
+         confirmLockInBtn.addEventListener('click', () => {
+            if (selectedAnswerIndex === -1) return; // Should not happen if modal is open
+
+            answerIsLocked = true;
+            lockedAnswerIndex = selectedAnswerIndex; // Store the locked-in answer
+            optionBtns[lockedAnswerIndex].classList.remove('selected'); // Remove general selected
+            optionBtns[lockedAnswerIndex].classList.add('locked'); // Add specific locked style
+
+            hideFinalAnswerModal(); // Stops the ticking sound
+            updateNavigationAndControlButtons(); // Enables 'Check Answer' btn, disables options/lifelines
+         });
+
+         cancelLockInBtn.addEventListener('click', () => {
+            if (selectedAnswerIndex !== -1 && optionBtns[selectedAnswerIndex]) {
+                 optionBtns[selectedAnswerIndex].classList.remove('selected'); // Remove visual selection
+            }
+            selectedAnswerIndex = -1; // Reset selection
+            hideFinalAnswerModal(); // Stops the ticking sound
+         });
+
+         function hideFinalAnswerModal() {
+             stopSound('sound-final-answer-tick');
+             finalAnswerModal.classList.add('hidden');
+             finalAnswerModal.classList.remove('flex');
+         }
+
+        checkAnswerBtn.addEventListener('click', () => {
+            if (!answerIsLocked || questions[currentQuestionIndex].answered) return;
+
+            const question = questions[currentQuestionIndex];
+            const isCorrect = lockedAnswerIndex === question.correctAnswer;
+
+            question.answered = true; // Mark question as answered
+            question.correct = isCorrect; // Store if their answer was correct
+
+            optionBtns.forEach(btn => btn.disabled = true); // Disable all options permanently for this question view
+            checkAnswerBtn.classList.add('hidden'); // Hide check button after checking
+            checkAnswerBtn.disabled = true;
+
+
+            if (isCorrect) {
+                playSound('sound-correct');
+                optionBtns[lockedAnswerIndex].classList.remove('locked');
+                optionBtns[lockedAnswerIndex].classList.add('correct');
+                currentWinnings = prizeMoney[currentQuestionIndex]; // Award prize for this level
+                earnedPrizeEl.textContent = `Earned: ${formatCurrency(currentWinnings)}`;
+
+                // Update highest safe haven reached
+                if (safeHavensIndices.includes(currentQuestionIndex)) {
+                    highestSafeHavenReached = prizeMoney[currentQuestionIndex];
+                }
+
+                if (currentQuestionIndex === questions.length - 1) { // Last question answered correctly
+                    setTimeout(() => winGame(), 2000);
+                } else {
+                    // Player can now use Next/Prev to navigate, or just Next to proceed in order
+                    // "Next Question" button is already managed by updateNavigationAndControlButtons
+                    // if we want to auto-advance, we'd call nextQNavBtn.click() or similar logic here
+                }
+
+            } else {
+                playSound('sound-incorrect');
+                optionBtns[lockedAnswerIndex].classList.remove('locked');
+                optionBtns[lockedAnswerIndex].classList.add('incorrect');
+                if (question.correctAnswer !== -1 && optionBtns[question.correctAnswer]) { // Highlight correct one
+                    optionBtns[question.correctAnswer].classList.add('correct');
+                }
+                setTimeout(() => {
+                    // Game over, winnings drop to last safe haven.
+                    // currentWinnings is already the value of the last correctly answered Q.
+                    // We need to find the appropriate safe haven based on currentWinnings.
+                    let finalPayout = 0;
+                    // Iterate backwards through safe havens to find the one they passed
+                    for (let i = safeHavensIndices.length - 1; i >= 0; i--) {
+                        if (currentQuestionIndex > safeHavensIndices[i]) { // Must have *passed* the question index of a safe haven
+                             // And that safe haven question must have been answered correctly
+                            if (questions[safeHavensIndices[i]].answered && questions[safeHavensIndices[i]].correct) {
+                                finalPayout = prizeMoney[safeHavensIndices[i]];
+                                break;
+                            }
+                        }
+                    }
+                     // If they get first few questions wrong before first safe haven, they get 0
+                    if (currentQuestionIndex < safeHavensIndices[0]) {
+                        finalPayout = 0;
+                    }
+
+
+                    // If they got it wrong, currentWinnings should be the last safe haven achieved
+                    // This needs careful recalculation. For now, use `highestSafeHavenReached`.
+                    // The actual logic for "money lost" needs to be tied to the point of failure relative to safe havens.
+                    // Let's use the highestSafeHavenReached.
+                    const correctOptText = `${String.fromCharCode(65 + question.correctAnswer)}: ${question.options[question.correctAnswer]}`;
+                    gameOver(false, highestSafeHavenReached, `Oops! The correct answer was ${correctOptText}.`);
+                }, 2500);
+            }
+            updateNavigationAndControlButtons(); // Re-evaluate button states
+        });
+
+
+         // --- Lifeline Functions (largely same, but check 'answerIsLocked' or 'question.answered') ---
+         function useLifeline(lifelineType) {
+            if (answerIsLocked || questions[currentQuestionIndex].answered) return; // Cannot use after locking or if answered
+            playSound('sound-lifeline');
+            let lifelineBtnId;
+            if (lifelineType === 'fiftyFifty') {
+                lifelines.fiftyFifty = false;
+                lifelineBtnId = 'lifeline-5050';
+            } else if (lifelineType === 'phoneAFriend') {
+                lifelines.phoneAFriend = false;
+                lifelineBtnId = 'lifeline-phone';
+            } else if (lifelineType === 'askTheAudience') {
+                lifelines.askTheAudience = false;
+                lifelineBtnId = 'lifeline-audience';
+            }
+            document.getElementById(lifelineBtnId).disabled = true;
+            document.getElementById(lifelineBtnId).classList.add('opacity-40', 'cursor-not-allowed');
+         }
+         function useLifeline5050() {
+             if (!lifelines.fiftyFifty || answerIsLocked || questions[currentQuestionIndex].answered) return;
+             useLifeline('fiftyFifty');
+             const question = questions[currentQuestionIndex];
+             const correctAnswerIdx = question.correctAnswer;
+             let incorrectOptionsIndices = [];
+             for (let i = 0; i < 4; i++) {
+                 if (i !== correctAnswerIdx) incorrectOptionsIndices.push(i);
+             }
+             incorrectOptionsIndices.sort(() => 0.5 - Math.random());
+             const indicesToRemove = incorrectOptionsIndices.slice(0, 2);
+             indicesToRemove.forEach(idx => {
+                 optionBtns[idx].innerHTML = `${String.fromCharCode(65 + idx)}: ---`;
+                 optionBtns[idx].disabled = true; // Disable them directly
+                 optionBtns[idx].classList.add('opacity-50', 'cursor-not-allowed', 'bg-slate-500');
+                 optionBtns[idx].classList.remove('hover:bg-blue-700');
+             });
+         }
+         function useLifelinePhoneAFriend() { /* ... (similar check for answerIsLocked) ... */ }
+         function useLifelineAskTheAudience() { /* ... (similar check for answerIsLocked) ... */ }
+
+         // (Copy existing lifeline functions here, ensuring they check `answerIsLocked` or `questions[currentQuestionIndex].answered` before proceeding)
+         function useLifelinePhoneAFriend() {
+            if (!lifelines.phoneAFriend || answerIsLocked || questions[currentQuestionIndex].answered) return;
+            useLifeline('phoneAFriend');
+            const question = questions[currentQuestionIndex];
+            let suggestionIndex;
+            if (Math.random() < 0.75) { suggestionIndex = question.correctAnswer; }
+            else {
+                const availableOptions = [];
+                optionBtns.forEach((btn, index) => { if (!btn.disabled) availableOptions.push(index); });
+                if (availableOptions.length > 0) {
+                    suggestionIndex = availableOptions[Math.floor(Math.random() * availableOptions.length)];
+                } else { // All disabled (e.g. after 50/50 left only 1 enabled that was wrong) - suggest anything not disabled before 50/50
+                    suggestionIndex = Math.floor(Math.random() * 4); // Fallback
+                }
+            }
+            const suggestedOptionLetter = String.fromCharCode(65 + suggestionIndex);
+            phoneAFriendTextEl.textContent = `Your friend thinks it's... ${suggestedOptionLetter}: ${question.options[suggestionIndex]}`;
+            phoneAFriendTextEl.classList.remove('hidden');
+            if (optionBtns[suggestionIndex] && !optionBtns[suggestionIndex].disabled) {
+                optionBtns[suggestionIndex].classList.add('ring-2', 'ring-yellow-400');
+                setTimeout(() => {
+                    optionBtns[suggestionIndex].classList.remove('ring-2', 'ring-yellow-400');
+                    phoneAFriendTextEl.classList.add('hidden');
+                }, 5000);
+            }
+        }
+        function useLifelineAskTheAudience() {
+            if (!lifelines.askTheAudience || answerIsLocked || questions[currentQuestionIndex].answered) return;
+            useLifeline('askTheAudience');
+            const question = questions[currentQuestionIndex];
+            const correctAnswerIdx = question.correctAnswer;
+            let percentages = [0, 0, 0, 0]; let remainingPercentage = 100;
+            const correctPercentage = Math.floor(Math.random() * 31) + 40; // 40 to 70
+            percentages[correctAnswerIdx] = correctPercentage; remainingPercentage -= correctPercentage;
+            const availableOptionIndices = [];
+            optionBtns.forEach((btn, index) => { if (!btn.disabled && index !== correctAnswerIdx) availableOptionIndices.push(index); });
+            availableOptionIndices.forEach((idx, arrIdx) => {
+                if (arrIdx === availableOptionIndices.length - 1) { percentages[idx] = remainingPercentage; }
+                else {
+                    const randomShare = Math.floor(Math.random() * (remainingPercentage / (availableOptionIndices.length - arrIdx)));
+                    percentages[idx] = randomShare; remainingPercentage -= randomShare;
+                }
+            });
+            let currentSum = percentages.reduce((a,b) => a+b, 0);
+            if (currentSum !== 100 && availableOptionIndices.length > 0) {
+                percentages[availableOptionIndices[availableOptionIndices.length-1]] += (100 - currentSum);
+            } else if (currentSum !== 100 && availableOptionIndices.length === 0 && !optionBtns[correctAnswerIdx].disabled) { // Only correct answer is available
+                 percentages[correctAnswerIdx] = 100; // Give it all
+            } else if (currentSum !== 100) { // Distribute remainder if all options somehow available again
+                 // This case should be rare if buttons are properly disabled
+                 let stillAvailable = [];
+                 percentages.forEach((p, i) => { if(!optionBtns[i].disabled) stillAvailable.push(i); });
+                 if(stillAvailable.length > 0) percentages[stillAvailable[0]] += (100-currentSum);
+            }
+
+            audiencePollResultsEl.innerHTML = '';
+            percentages.forEach((perc, index) => {
+                if (!optionBtns[index].disabled) { // Only show poll for non-disabled options
+                    const barContainer = document.createElement('div'); barContainer.className = 'flex items-center mb-1';
+                    const label = document.createElement('span'); label.className = 'w-6 mr-1 text-xs'; label.textContent = `${String.fromCharCode(65 + index)}:`;
+                    const barOuter = document.createElement('div'); barOuter.className = 'w-full bg-slate-600 rounded h-4';
+                    const barInner = document.createElement('div'); barInner.className = 'bg-yellow-500 h-4 rounded text-black text-xs flex items-center justify-center';
+                    barInner.style.width = `${perc}%`; barInner.textContent = `${perc}%`;
+                    barOuter.appendChild(barInner); barContainer.appendChild(label); barContainer.appendChild(barOuter);
+                    audiencePollResultsEl.appendChild(barContainer);
+                }
+            });
+            audiencePollContainer.classList.remove('hidden');
+        }
+
+
+         function walkAway() {
+             playSound('sound-walk-away');
+             // Winnings are the prize money from the last *correctly answered question at a lower level*
+             // or the highest safe haven reached if that's greater.
+             // currentWinnings should reflect the last correctly answered question's value.
+             gameOver(true, currentWinnings, "You decided to walk away with your earnings.");
+         }
+
+         function winGame() {
+             playSound('sound-win');
+             gameOver(true, prizeMoney[prizeMoney.length - 1], "Congratulations! You got a 5!");
+         }
+
+         function gameOver(walkedOrWon, amount, message) {
+             gameIsOver = true;
+             stopAllSounds();
+             if (!walkedOrWon) { playSound('sound-game-over');}
+
+             gameScreen.classList.add('hidden');
+             gameOverScreen.classList.remove('hidden');
+
+             if (walkedOrWon && amount === prizeMoney[prizeMoney.length - 1]) {
+                 gameOverTitleEl.textContent = "YOU GOT A 5!";
+                 gameOverTitleEl.classList.add('text-green-400');
+             } else if (walkedOrWon) {
+                 gameOverTitleEl.textContent = "You Walked Away :((";
+                 gameOverTitleEl.classList.remove('text-green-400');
+             } else {
+                 gameOverTitleEl.textContent = "Game Over!";
+                 gameOverTitleEl.classList.remove('text-green-400');
+             }
+             finalWinningsEl.textContent = `You won: ${formatCurrency(amount)}`;
+             gameOverMessageEl.textContent = message;
+         }
+
+         function resetGameData() {
+            currentQuestionIndex = 0;
+            currentWinnings = 0;
+            highestSafeHavenReached = 0;
+            selectedAnswerIndex = -1;
+            lockedAnswerIndex = -1;
+            answerIsLocked = false;
+            gameIsOver = false;
+            lifelines = { fiftyFifty: true, phoneAFriend: true, askTheAudience: true };
+            questions.forEach(q => { // Reset answered state for all questions
+                q.answered = false;
+                q.correct = null;
+            });
+            resetLifelineButtonsState();
+         }
+         function resetLifelineButtonsState() {
+            [lifeline5050Btn, lifelinePhoneBtn, lifelineAudienceBtn].forEach(btn => {
+                 btn.disabled = false;
+                 btn.classList.remove('opacity-40', 'cursor-not-allowed');
+            });
+            audiencePollContainer.classList.add('hidden');
+            phoneAFriendTextEl.classList.add('hidden');
+         }
+
+
+         function startGame() {
+             playSound('sound-start');
+             resetGameData(); // Reset all game state variables
+
+             startScreen.classList.add('hidden');
+             gameOverScreen.classList.add('hidden');
+             gameScreen.classList.remove('hidden');
+
+             initializePrizeLadder(); // Initialize prize ladder visuals
+             displayQuestion(); // Display the first question
+         }
+
+
+         // ------------- ADD QUESTION LOGIC (same as before) ------------- //
+         function openAddQuestionModal() { /* ... */ }
+         function closeAddQuestionModal() { /* ... */ }
+         function handleAddQuestionSubmit(event) { /* ... */ }
+         // (Copy existing Add Question functions here)
+        function openAddQuestionModal() {
+            addQuestionForm.reset();
+            addQuestionModal.classList.remove('hidden');
+            addQuestionModal.classList.add('flex');
+         }
+         function closeAddQuestionModal() {
+            addQuestionModal.classList.add('hidden');
+            addQuestionModal.classList.remove('flex');
+         }
+         function handleAddQuestionSubmit(event) {
+            event.preventDefault();
+            const newQText = document.getElementById('new-question-text').value.trim();
+            const newOpts = [
+                document.getElementById('new-option-a').value.trim(),
+                document.getElementById('new-option-b').value.trim(),
+                document.getElementById('new-option-c').value.trim(),
+                document.getElementById('new-option-d').value.trim()
+            ];
+            const newCorrect = parseInt(document.getElementById('new-correct-answer').value);
+            if (newQText && newOpts.every(opt => opt) && newCorrect >= 0 && newCorrect <= 3) {
+                questions.push({ question: newQText, options: newOpts, correctAnswer: newCorrect, answered: false, correct: null });
+                alert('Question added for this session!'); console.log("Current questions:", questions);
+                closeAddQuestionModal();
+            } else { alert('Please fill all fields correctly.'); }
+         }
+
+
+         // ------------- EVENT LISTENERS ------------- //
+         startGameBtn.addEventListener('click', startGame);
+         playAgainBtn.addEventListener('click', startGame);
+         walkAwayBtn.addEventListener('click', () => {
+            // For Walk Away, modal confirmation text might need to reflect current earned winnings.
+            modalQuestionTextEl.innerHTML = `Are you sure you want to walk away with <br><span class="text-white font-bold">${formatCurrency(currentWinnings)}</span>?`;
+            finalAnswerModal.classList.remove('hidden');
+            finalAnswerModal.classList.add('flex');
+            playSound('sound-final-answer-tick', true);
+
+            // Temporarily change modal buttons for walk away
+            confirmLockInBtn.onclick = () => { hideFinalAnswerModal(); walkAway(); confirmLockInBtn.onclick = confirmLockInClickHandler; }; // Restore original after
+            cancelLockInBtn.onclick = () => { hideFinalAnswerModal(); cancelLockInBtn.onclick = cancelLockInClickHandler; }; // Restore original after
+         });
+
+         optionBtns.forEach(btn => {
+             btn.addEventListener('click', handleOptionClick);
+         });
+
+        // Store original handlers to restore them
+        const confirmLockInClickHandler = confirmLockInBtn.onclick;
+        const cancelLockInClickHandler = cancelLockInBtn.onclick;
+
+
+         lifeline5050Btn.addEventListener('click', useLifeline5050);
+         lifelinePhoneBtn.addEventListener('click', useLifelinePhoneAFriend);
+         lifelineAudienceBtn.addEventListener('click', useLifelineAskTheAudience);
+
+         addQuestionDevBtn.addEventListener('click', openAddQuestionModal);
+         cancelAddQuestionBtn.addEventListener('click', closeAddQuestionModal);
+         addQuestionForm.addEventListener('submit', handleAddQuestionSubmit);
+
+         // Navigation Button Listeners
+         nextQNavBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+         });
+         prevQNavBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+         });
+
+     </script>
+ </body>
+ </html>
+
+
