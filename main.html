@@ -5,248 +5,208 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Millionaire Quiz Game</title>
   <style>
-    /* Fonts */
     @import url('https://fonts.googleapis.com/css2?family=Palatino+Linotype&display=swap');
 
     body {
       font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
-      background: linear-gradient(135deg, #0f0f3e, #1a1a60);
-      color: #fff;
+      background-color: #f0f0f0;
+      color: #000;
       margin: 0;
       padding: 0;
       display: flex;
+      flex-direction: column;
       height: 100vh;
-      overflow: hidden;
     }
 
-    /* Grid layout */
     .container {
-      display: grid;
-      grid-template-columns: 1fr 3.5fr 1fr;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Sidebar left: lifelines and give up */
-    .sidebar {
-      background: rgba(0,0,0,0.3);
-      padding: 1em;
+      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 1em;
       align-items: center;
       justify-content: center;
+      padding: 2em;
     }
 
-    /* Square-ish buttons with consistent size */
-    .sidebar button, .lifelines button {
-      width: 120px; /* wider rectangle */
-      height: 40px; /* shorter height */
-      border-radius: 8px;
-      background: gold;
-      border: none;
-      color: #111;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 0 10px #ffd70088;
-      transition: background 0.3s, transform 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85em;
-      text-align: center;
-      user-select: none;
-    }
-    .sidebar button:disabled, .lifelines button:disabled {
-      background: gray;
-      cursor: not-allowed;
-      box-shadow: none;
-      color: #555;
-    }
-    .sidebar button:hover:not(:disabled), .lifelines button:hover:not(:disabled) {
-      background: #ffd700;
-      transform: scale(1.1);
-    }
-
-    .lifelines {
-      display: flex;
-      flex-direction: column;
-      gap: 1em;
-      width: 100%;
-      align-items: center;
-    }
-
-    /* Center panel */
-    .game-main {
-      padding: 2em 3em;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-size: 1.15rem; /* unified font size */
-      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
-    }
-
-    /* Question box slightly smaller */
     .question-box {
+      background: #ffffffee;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #aaa;
+      padding: 2em;
+      max-width: 700px;
       width: 100%;
-      max-width: 600px;
-      margin: 1em auto;
-      padding: 1.5em 2em;
-      background: rgba(255, 255, 255, 0.07);
-      border-radius: 15px;
-      box-shadow: 0 0 25px #000a;
-      line-height: 1.4;
+      margin-bottom: 2em;
+      text-align: center;
     }
 
-    /* Question text */
     #question-text {
-      margin-bottom: 1em;
+      margin-bottom: 1.2em;
+      font-size: 1.25rem;
       font-weight: 600;
     }
 
-    /* Answers buttons */
     .answers {
-      margin-top: 0.7em;
       display: flex;
       flex-direction: column;
-      gap: 0.8em;
+      gap: 1em;
     }
 
     .answers button {
-      position: relative;
-      background: linear-gradient(45deg, #005bea, #00c6fb);
-      border: 2px solid #fff2;
-      border-radius: 12px;
+      background-color: #dceeff;
+      border: 2px solid #b0d0f0;
+      border-radius: 10px;
       padding: 1em;
-      font-size: 1.15rem; /* same font size */
+      font-size: 1rem;
       font-family: inherit;
-      color: white;
-      cursor: pointer;
-      width: 100%;
-      max-width: 600px;
       text-align: left;
-      overflow: hidden;
-      user-select: none;
-      transition: background 0.3s ease, transform 0.2s ease;
-      display: flex;
-      align-items: center;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
     }
+
     .answers button:hover {
-      background: linear-gradient(45deg, #003f8a, #00a6db);
-      transform: scale(1.03);
+      background-color: #c7e5ff;
+      transform: scale(1.02);
     }
+
+    .answers button.selected {
+      background-color: #b8dbff;
+      border-color: #7abaff;
+    }
+
     .answers button.hidden {
       display: none;
     }
-    .answers button.selected {
-      border: 2px solid yellow;
+
+    #check-answer-btn {
+      margin-top: 1.5em;
+      padding: 0.8em 2em;
+      font-size: 1.1rem;
+      background-color: #0077ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
     }
 
-    /* Fill bar for audience lifeline */
-    .answers button .fill-bar {
-      position: absolute;
-      top: 0; left: 0; bottom: 0;
-      background-color: rgba(46, 204, 64, 0.6);
-      z-index: 0;
-      width: 0%;
-      transition: width 1s ease-in-out;
-      border-radius: 12px 0 0 12px;
-    }
-    .answers button span {
-      position: relative;
-      z-index: 1;
-      flex: 1;
+    #check-answer-btn:hover {
+      background-color: #005fcc;
     }
 
-    /* Hint */
     .hint {
       margin-top: 1em;
-      font-style: italic;
-      background: #333;
       padding: 1em;
+      background-color: #eee;
       border-radius: 10px;
+      font-style: italic;
       display: none;
-      font-size: 1rem;
     }
 
-    /* Check answer button */
-    #check-answer-btn {
-      margin-top: 1.2em;
-      padding: 0.8em 2em;
-      background: #0077ff;
-      border: none;
-      border-radius: 12px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      color: white;
-      user-select: none;
-      transition: background 0.3s ease;
-    }
-    #check-answer-btn:hover {
-      background: #005fcc;
-    }
-
-    /* Tracker on right as rounded squares */
-    .tracker {
+    .lifelines {
+      position: fixed;
+      top: 50%;
+      left: 1em;
+      transform: translateY(-50%);
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      gap: 1em;
-      padding: 0 0.5em;
-      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+      gap: 1.5em;
+      z-index: 20;
     }
-    .tracker div {
-      width: 45px;
-      height: 45px;
-      background: #c0c0c0; /* original gray */
-      color: black;
+
+    .lifelines button {
+      background-color: gold;
+      border: none;
+      border-radius: 10px;
+      padding: 0.6em 1em;
+      cursor: pointer;
       font-weight: bold;
-      font-size: 1.2rem;
-      border-radius: 12px;
+      box-shadow: 0 0 8px #ffd70088;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .lifelines button:hover:not(:disabled) {
+      background-color: #ffd700;
+      transform: scale(1.05);
+    }
+
+    .lifelines button:disabled {
+      background: gray;
+      cursor: not-allowed;
+      color: #444;
+      box-shadow: none;
+    }
+
+    #give-up-btn {
+      margin-top: 1em;
+      padding: 0.6em 1.5em;
+      background: #ddd;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #give-up-btn:hover {
+      background-color: #ccc;
+    }
+
+    .tracker {
+      display: flex;
+      justify-content: center;
+      gap: 0.6em;
+      padding: 1em 0;
+      background: #e0e0e0;
+      border-top: 2px solid #ccc;
+    }
+    
+    .tracker div {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background-color: #bbb;
+      color: #000;
       display: flex;
       justify-content: center;
       align-items: center;
+      font-weight: bold;
+      font-family: 'Palatino Linotype', serif;
+      font-size: 1.1rem;
+      transition: background-color 0.3s;
       user-select: none;
-      border: 2px solid #888;
-      transition: background-color 0.3s ease, border-color 0.3s ease;
-      cursor: default;
     }
-    .tracker div.active {
-      background: #2a76ff; /* bright blue */
-      border-color: #144f9c; /* darker blue border */
-      color: white;
+    
+    .tracker div.correct {
+      background-color: #2a76ff; /* blue for correct */
+      color: #fff;
     }
 
-    /* Start and result screens */
-    .result-screen, .start-screen {
+
+    .start-screen,
+    .result-screen {
       position: absolute;
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       text-align: center;
-      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
-      color: white;
       padding: 2em;
+      z-index: 10;
     }
 
-    /* Titles are bigger and bolder */
-    .start-screen h1, .result-screen h2 {
+    .start-screen h1,
+    .result-screen h2 {
       font-size: 3rem;
       font-weight: 900;
-      margin-bottom: 1rem;
-      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
       color: #ffd700;
-      user-select: none;
+      margin-bottom: 1em;
     }
 
-    .start-screen button, .result-screen button {
+    .start-screen button,
+    .result-screen button {
       padding: 1em 2em;
       font-size: 1.2em;
       background: linear-gradient(45deg, #ff6a00, #ee0979);
@@ -254,214 +214,272 @@
       border-radius: 12px;
       color: white;
       cursor: pointer;
-      margin-top: 1em;
-      user-select: none;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s;
     }
-    .start-screen button:hover, .result-screen button:hover {
+    
+    .lifeline-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .lifeline-item img {
+      height: 60px;
+      transition: transform 0.2s, filter 0.3s;
+    }
+    
+    .lifeline-item:hover img:not([disabled]) {
       transform: scale(1.1);
+      filter: drop-shadow(0 0 5px #00aaff);
+    }
+    
+    .lifeline-item[disabled] img {
+      filter: grayscale(100%) brightness(60%);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    
+    .lifeline-label {
+      margin-top: 0.3em;
+      font-family: 'Palatino Linotype', serif;
+      font-size: 0.9rem;
+      color: #333;
+      text-align: center;
+      pointer-events: none; /* so text doesn’t block clicks */
+      user-select: none;
     }
 
+
+    .start-screen button:hover,
+    .result-screen button:hover {
+      transform: scale(1.1);
+    }
   </style>
 </head>
 <body>
   <div class="start-screen" id="start-screen">
-    <h1>Who Wants to Be a Millionaire</h1>
+    <h1>Who Wants to Be a Millionaire?</h1>
     <button onclick="startGame()">Start Game</button>
   </div>
 
-  <div class="container" id="game-container" style="display:none;">
-    <div class="sidebar">
-      <div class="lifelines">
-        <button id="audience-btn" title="Ask the Audience" onclick="useAudience()">Ask the Procter</button>
-        <button id="fifty-btn" title="50:50" onclick="useFiftyFifty()">Lucky Guess</button>
-        <button id="phone-btn" title="Phone a Friend" onclick="usePhoneAFriend()">Whisper to a Freind</button>
+  <div class="container" id="quiz-container" style="display: none;">
+    <div class="lifelines">
+      <div class="lifeline-item" onclick="useFiftyFifty()">
+        <img id="fifty-btn" src="https://assets.iflscience.com/assets/articleNo/71047/aImg/71241/coin-toss-meta.png" alt="50/50 Lifeline" title="50/50 Lifeline" />
+        <div class="lifeline-label">50/50</div>
       </div>
-      <button id="give-up-btn" title="I Give Up" onclick="confirmGiveUp()">I Give Up :((</button>
-    </div>
-
-    <div class="game-main">
-      <div class="question-box">
-        <div id="question-text"></div>
-        <div class="answers" id="answers"></div>
-        <button id="check-answer-btn" onclick="checkSelectedAnswer()">Check My Answer</button>
-        <div class="hint" id="hint"></div>
+      <div class="lifeline-item" onclick="askAudience()">
+        <img id="audience-btn" src="https://cdn.sanity.io/images/7i1ps9pf/production/84c9406f1c438f37fbd6cc07730cd6c43b159b63-5644x3763.jpg" alt="Ask the Audience" title="Ask the Audience" />
+        <div class="lifeline-label">Ask the Procters</div>
+      </div>
+      <div class="lifeline-item" onclick="phoneFriend()">
+        <img id="phone-btn" src="https://media.istockphoto.com/id/1325458178/photo/whispering-the-right-answer.jpg?s=612x612&w=0&k=20&c=ktxzDRGE92e82T34yfjRU7GG8W6DAJA5hZyji8Pn3yg=" alt="Phone a Friend" title="Phone a Friend" />
+        <div class="lifeline-label">Whisper to a Freind</div>
       </div>
     </div>
 
-    <div class="tracker">
-      <div id="step1">1</div>
-      <div id="step2">2</div>
-      <div id="step3">3</div>
-      <div id="step4">4</div>
-      <div id="step5">5</div>
+
+    <div class="question-box">
+      <div id="question-text">Question appears here...</div>
+      <div class="answers" id="answer-buttons">
+        <button onclick="selectAnswer(this)">Answer A</button>
+        <button onclick="selectAnswer(this)">Answer B</button>
+        <button onclick="selectAnswer(this)">Answer C</button>
+        <button onclick="selectAnswer(this)">Answer D</button>
+      </div>
+      <button id="check-answer-btn" onclick="checkAnswer()">Check Answer</button>
+      <div class="hint" id="hint-box">Hint appears here</div>
+      
     </div>
   </div>
 
-  <div class="result-screen" id="result-screen" style="display:none;">
-    <h2 id="result-message">Game Over</h2>
-    <p>You reached Level <span id="level-reached"></span></p>
-    <button onclick="startGame()">Play Again</button>
+  <div class="result-screen" id="result-screen" style="display: none;">
+    <h2>Game Over!</h2>
+    <p id="final-score-text"></p>
+    <button onclick="restartGame()">Play Again</button>
   </div>
+
+  <div class="tracker" id="progress-tracker"></div>
 
   <script>
-    const categoryOrder = ['math', 'science', 'history', 'geography', 'sports'];
-    const categories = {
-      math: [ { q: "What is 2 + 2?", a: "4", hint: "Simple addition." } ],
-      science: [ { q: "What planet is known as the Red Planet?", a: "Mars", hint: "Named after a Roman god." } ],
-      history: [ { q: "Who was the first President of the USA?", a: "George Washington", hint: "Revolutionary War general." } ],
-      geography: [ { q: "What is the capital of France?", a: "Paris", hint: "City of lights." } ],
-      sports: [ { q: "How many players on a soccer team?", a: "11", hint: "One more than ten." } ]
-    };
-
-    let level = 0;
-    const maxLevels = 5;
-    let currentQuestion = null;
-    let selectedAnswer = null;
-    let lifelinesUsed = { audience: false, fifty: false, phone: false };
-
-    function updateProgress() {
-      for (let i = 1; i <= maxLevels; i++) {
-        const step = document.getElementById(`step${i}`);
-        step.classList.remove('active');
-        if (i < level + 1) {
-          // Filled squares for answered questions
-          step.style.backgroundColor = "#2a76ff";
-          step.style.borderColor = "#144f9c";
-          step.style.color = "white";
-        } else {
-          // Default style
-          step.style.backgroundColor = "#c0c0c0";
-          step.style.borderColor = "#888";
-          step.style.color = "black";
-        }
+    const questions = [
+      {
+        text: "What is the integral of x dx?",
+        answers: ["1/2 x^2 + C", "x + C", "ln|x| + C", "x^2 + C"],
+        correct: "1/2 x^2 + C",
+        hint: "Use power rule of integration."
+      },
+      {
+        text: "What is ∫cos(x) dx?",
+        answers: ["sin(x) + C", "-cos(x) + C", "-sin(x) + C", "cos(x) + C"],
+        correct: "sin(x) + C",
+        hint: "Derivative of sin(x) is cos(x)."
+      },
+      {
+        text: "∫1/x dx equals...",
+        answers: ["ln|x| + C", "x ln|x| - x + C", "1/(x^2) + C", "x^2/2 + C"],
+        correct: "ln|x| + C",
+        hint: "Think of the natural logarithm."
+      },
+      {
+        text: "Which of these is an antiderivative of e^x?",
+        answers: ["e^x + C", "x * e^x + C", "ln(x) + C", "1/e^x + C"],
+        correct: "e^x + C",
+        hint: "Derivative of e^x is e^x."
+      },
+      {
+        text: "∫sec^2(x) dx equals...",
+        answers: ["tan(x) + C", "sec(x)tan(x) + C", "sin(x) + C", "ln|cos(x)| + C"],
+        correct: "tan(x) + C",
+        hint: "What function's derivative is sec²(x)?"
       }
-      if (level < maxLevels) {
-        // Highlight current step as active (bright blue background)
-        const current = document.getElementById(`step${level + 1}`);
-        current.classList.add('active');
-        current.style.backgroundColor = "#2a76ff";
-        current.style.borderColor = "#144f9c";
-        current.style.color = "white";
-      }
-    }
+    ];
+
+    let currentQuestion = 0;
+    let selectedButton = null;
+    let correctAnswers = 0;
 
     function startGame() {
-      level = 0;
-      selectedAnswer = null;
-      lifelinesUsed = { audience: false, fifty: false, phone: false };
       document.getElementById("start-screen").style.display = "none";
+      document.getElementById("quiz-container").style.display = "flex";
       document.getElementById("result-screen").style.display = "none";
-      document.getElementById("game-container").style.display = "grid";
+      currentQuestion = 0;
+      correctAnswers = 0;
+      selectedButton = null;
 
-      document.getElementById("audience-btn").disabled = false;
-      document.getElementById("fifty-btn").disabled = false;
-      document.getElementById("phone-btn").disabled = false;
-
-      updateProgress();
-      loadQuestion();
+      createTracker();
+      showQuestion();
     }
 
-    function loadQuestion() {
-      const category = categoryOrder[level];
-      const question = categories[category][Math.floor(Math.random() * categories[category].length)];
-      currentQuestion = question;
-      selectedAnswer = null;
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById("question-text").innerText = q.text;
+      const buttons = document.querySelectorAll("#answer-buttons button");
 
-      updateProgress();
-
-      document.getElementById("question-text").innerText = question.q;
-      document.getElementById("hint").style.display = 'none';
-      document.getElementById("hint").innerText = "";
-
-      const answersBox = document.getElementById("answers");
-      answersBox.innerHTML = "";
-
-      const allAnswers = [question.a, "Wrong 1", "Wrong 2", "Wrong 3"].sort(() => Math.random() - 0.5);
-      allAnswers.forEach(ans => {
-        const btn = document.createElement("button");
-        btn.innerHTML = `<div class='fill-bar'></div><span>${ans}</span>`;
-        btn.onclick = () => {
-          document.querySelectorAll(".answers button").forEach(b => b.classList.remove("selected"));
-          btn.classList.add("selected");
-          selectedAnswer = ans;
-        };
-        answersBox.appendChild(btn);
+      buttons.forEach((btn, index) => {
+        btn.classList.remove("selected", "hidden");
+        btn.disabled = false;
+        btn.innerText = q.answers[index];
       });
+
+      document.getElementById("hint-box").style.display = "none";
+      selectedButton = null;
     }
 
-    function checkSelectedAnswer() {
-      if (!selectedAnswer) {
-        alert("Please select an answer.");
-        return;
+    function selectAnswer(button) {
+      const buttons = document.querySelectorAll("#answer-buttons button");
+      buttons.forEach(btn => btn.classList.remove("selected"));
+      button.classList.add("selected");
+      selectedButton = button;
+    }
+
+    function checkAnswer() {
+      if (!selectedButton) return;
+    
+      const selectedText = selectedButton.innerText;
+      const correctText = questions[currentQuestion].correct;
+    
+      if (selectedText === correctText) {
+        // Add correct class to current question box in tracker
+        const trackerBoxes = document.getElementById("progress-tracker").children;
+        trackerBoxes[currentQuestion].classList.add("correct");
+        correctAnswers++;
       }
-      if (selectedAnswer === currentQuestion.a) {
-        level++;
-        if (level >= maxLevels) {
-          showResult("You Won!");
-        } else {
-          loadQuestion();
-        }
+    
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
       } else {
-        showResult("You Lost!");
+        showResult();
       }
     }
 
-    function showResult(msg) {
-      document.getElementById("game-container").style.display = 'none';
-      document.getElementById("result-screen").style.display = 'flex';
-      document.getElementById("result-message").innerText = msg;
-      document.getElementById("level-reached").innerText = level;
+
+    
+      
+
+    function showResult() {
+      document.getElementById("quiz-container").style.display = "none";
+      document.getElementById("result-screen").style.display = "flex";
+      document.getElementById("final-score-text").innerText =
+        `You answered ${correctAnswers} out of ${questions.length} correctly.`;
     }
 
-    function useAudience() {
-      if (lifelinesUsed.audience) return;
-      lifelinesUsed.audience = true;
-      document.getElementById("audience-btn").disabled = true;
-
-      const options = document.querySelectorAll(".answers button");
-      options.forEach(btn => {
-        const text = btn.querySelector("span").innerText;
-        const isCorrect = text === currentQuestion.a;
-        // Remove percentage text, just show fill bars.
-        const pct = isCorrect ? 70 : Math.floor(Math.random() * 30);
-        btn.querySelector(".fill-bar").style.width = pct + '%';
-      });
+    function restartGame() {
+      document.getElementById("result-screen").style.display = "none";
+      document.getElementById("start-screen").style.display = "flex";
+      const tracker = document.getElementById("progress-tracker");
+      tracker.innerHTML = "";
     }
+
+    function giveUp() {
+      showResult();
+    }
+
+    function createTracker() {
+      const tracker = document.getElementById("progress-tracker");
+      tracker.innerHTML = "";
+      for (let i = 0; i < questions.length; i++) {
+        const box = document.createElement("div");
+        box.classList.add("tracker-box");
+        box.innerText = (i + 1); // Number the box 1 to 5
+        tracker.appendChild(box);
+      }
+    }
+
 
     function useFiftyFifty() {
-      if (lifelinesUsed.fifty) return;
-      lifelinesUsed.fifty = true;
+      const q = questions[currentQuestion];
+      const correct = q.correct;
+      const buttons = Array.from(document.querySelectorAll("#answer-buttons button"));
+
+      const wrongButtons = buttons.filter(btn => btn.innerText !== correct);
+      shuffle(wrongButtons);
+
+      wrongButtons.slice(0, 2).forEach(btn => {
+        btn.classList.add("hidden");
+        btn.disabled = true;
+      });
+
       document.getElementById("fifty-btn").disabled = true;
-
-      const buttons = Array.from(document.querySelectorAll(".answers button"));
-      let removed = 0;
-      for (let btn of buttons) {
-        const text = btn.querySelector("span").innerText;
-        if (text !== currentQuestion.a && removed < 2) {
-          btn.classList.add("hidden");
-          removed++;
-        }
-      }
     }
 
-    function usePhoneAFriend() {
-      if (lifelinesUsed.phone) return;
-      lifelinesUsed.phone = true;
+    function askAudience() {
+      const q = questions[currentQuestion];
+      const correct = q.correct;
+      const buttons = Array.from(document.querySelectorAll("#answer-buttons button"));
+
+      const votes = buttons.map(btn => ({
+        text: btn.innerText,
+        percent: btn.innerText === correct ? getRandomInt(50, 80) : getRandomInt(5, 20)
+      }));
+
+      const result = votes.map(v => `${v.text}: ${v.percent}%`).join("\n");
+      alert("Audience Poll:\n" + result);
+
+      document.getElementById("audience-btn").disabled = true;
+    }
+
+    function phoneFriend() {
+      const hint = questions[currentQuestion].hint;
+      const hintBox = document.getElementById("hint-box");
+      hintBox.innerText = "Friend says: " + hint;
+      hintBox.style.display = "block";
       document.getElementById("phone-btn").disabled = true;
-
-      document.getElementById("hint").innerText = "Hint: " + currentQuestion.hint;
-      document.getElementById("hint").style.display = 'block';
     }
 
-    function confirmGiveUp() {
-      if (confirm("Are you sure you want to give up?")) {
-        if (confirm("This will end the game. Are you really sure?")) {
-          showResult("You Game Up");
-        }
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
       }
     }
-  
-  </script>
 
-</body> </html>
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+  </script>
+</body>
+</html>
