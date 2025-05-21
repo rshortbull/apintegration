@@ -36,6 +36,7 @@
       width: 100%;
       margin-bottom: 2em;
       text-align: center;
+      
     }
 
     #question-text {
@@ -51,6 +52,7 @@
     }
 
     .answers button {
+      position: relative;
       background-color: #dceeff;
       border: 2px solid #b0d0f0;
       border-radius: 10px;
@@ -60,7 +62,26 @@
       text-align: left;
       cursor: pointer;
       transition: background 0.3s, transform 0.2s;
+      overflow: hidden; /* to clip the fill bar */
     }
+    
+    .answers button .fill-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: rgba(42, 118, 255, 0.3); /* light blue, semi-transparent */
+      width: 0;
+      transition: width 1s ease;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .answers button span.answer-text {
+      position: relative;
+      z-index: 1;
+    }
+
 
     .answers button:hover {
       background-color: #c7e5ff;
@@ -357,16 +378,27 @@
       const q = questions[currentQuestion];
       document.getElementById("question-text").innerText = q.text;
       const buttons = document.querySelectorAll("#answer-buttons button");
-
+    
       buttons.forEach((btn, index) => {
         btn.classList.remove("selected", "hidden");
         btn.disabled = false;
-        btn.innerText = q.answers[index];
+        // Reset fill bar width:
+        let fillBar = btn.querySelector(".fill-bar");
+        if (!fillBar) {
+          fillBar = document.createElement("div");
+          fillBar.classList.add("fill-bar");
+          btn.prepend(fillBar);
+        }
+        fillBar.style.width = '0';
+    
+        // Wrap answer text in span for layering
+        btn.innerHTML = `<span class="answer-text">${q.answers[index]}</span>`;
       });
-
+    
       document.getElementById("hint-box").style.display = "none";
       selectedButton = null;
     }
+
 
     function selectAnswer(button) {
       const buttons = document.querySelectorAll("#answer-buttons button");
@@ -450,17 +482,26 @@
       const q = questions[currentQuestion];
       const correct = q.correct;
       const buttons = Array.from(document.querySelectorAll("#answer-buttons button"));
-
+    
       const votes = buttons.map(btn => ({
         text: btn.innerText,
         percent: btn.innerText === correct ? getRandomInt(50, 80) : getRandomInt(5, 20)
       }));
-
-      const result = votes.map(v => `${v.text}: ${v.percent}%`).join("\n");
-      alert("Audience Poll:\n" + result);
-
+    
+      // Normalize percentages so they sum to 100%
+      const total = votes.reduce((sum, v) => sum + v.percent, 0);
+      votes.forEach(v => v.percent = Math.round((v.percent / total) * 100));
+    
+      // Animate fill bars according to votes
+      votes.forEach((vote, i) => {
+        const btn = buttons[i];
+        const fillBar = btn.querySelector(".fill-bar");
+        fillBar.style.width = vote.percent + "%";
+      });
+    
       document.getElementById("audience-btn").disabled = true;
     }
+
 
     function phoneFriend() {
       const hint = questions[currentQuestion].hint;
