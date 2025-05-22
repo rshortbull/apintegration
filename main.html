@@ -224,6 +224,11 @@
       padding: 2em;
       z-index: 10;
     }
+    
+    .lifeline-item[disabled] {
+      pointer-events: none;
+      opacity: 0.6;
+    }
 
     .start-screen h1,
     .result-screen h2 {
@@ -470,20 +475,31 @@
 
 
     function useFiftyFifty() {
+
+      // Disable the 50/50 lifeline button visually and functionally
+      const fiftyBtn = document.getElementById("fifty-btn").parentElement;
+      fiftyBtn.setAttribute("disabled", true);
+    
+      // Hide two incorrect answers
       const q = questions[currentQuestion];
-      const correct = q.correct;
       const buttons = Array.from(document.querySelectorAll("#answer-buttons button"));
-
-      const wrongButtons = buttons.filter(btn => btn.innerText !== correct);
-      shuffle(wrongButtons);
-
-      wrongButtons.slice(0, 2).forEach(btn => {
-        btn.classList.add("hidden");
-        btn.disabled = true;
-      });
-
-      document.getElementById("fifty-btn").parentElement.setAttribute("disabled", true);
-
+    
+      // Find all incorrect buttons
+      const incorrectButtons = buttons.filter(btn => btn.innerText !== q.correct);
+    
+      // Randomly pick 2 incorrect answers to hide
+      let hiddenCount = 0;
+      while (hiddenCount < 2 && incorrectButtons.length > 0) {
+        // Random index from incorrectButtons array
+        const randIndex = Math.floor(Math.random() * incorrectButtons.length);
+        const btnToHide = incorrectButtons[randIndex];
+        btnToHide.classList.add("hidden");
+        btnToHide.disabled = true;
+    
+        // Remove the hidden button from array so we don't hide it twice
+        incorrectButtons.splice(randIndex, 1);
+        hiddenCount++;
+      }
     }
 
     function askAudience() {
@@ -491,44 +507,47 @@
       const correct = q.correct;
       const buttons = Array.from(document.querySelectorAll("#answer-buttons button"));
     
-      const votes = buttons.map(btn => ({
+      // Generate initial random percentages
+      let votes = buttons.map(btn => ({
         text: btn.innerText,
         percent: btn.innerText === correct ? getRandomInt(50, 80) : getRandomInt(5, 20)
       }));
     
-      // Normalize percentages so they sum to 100%
-      const total = votes.reduce((sum, v) => sum + v.percent, 0);
-      votes.forEach(v => v.percent = Math.round((v.percent / total) * 100));
+      // Normalize so total = 100%
+      let total = votes.reduce((sum, v) => sum + v.percent, 0);
+      votes = votes.map(v => ({...v, percent: Math.round((v.percent / total) * 100)}));
     
-      // Animate fill bars according to votes
+      // Animate fill bars smoothly
       votes.forEach((vote, i) => {
         const btn = buttons[i];
-        const fillBar = btn.querySelector(".fill-bar");
+        let fillBar = btn.querySelector(".fill-bar");
+        if (!fillBar) {
+          fillBar = document.createElement("div");
+          fillBar.classList.add("fill-bar");
+          btn.prepend(fillBar);
+        }
+        // Reset width first to trigger transition
+        fillBar.style.width = '0';
+        // Force reflow for transition restart
+        void fillBar.offsetWidth;
+        // Then set to vote percent
         fillBar.style.width = vote.percent + "%";
       });
     
-      document.getElementById("audience-btn").parentElement.setAttribute("disabled", true);
-
+      // Disable lifeline visually and functionally
+      const audienceBtn = document.getElementById("audience-btn").parentElement;
+      audienceBtn.setAttribute("disabled", true);
     }
-
 
     function phoneFriend() {
       const hint = questions[currentQuestion].hint;
       const hintBox = document.getElementById("hint-box");
-      hintBox.innerText = "Friend says: " + hint;
+      hintBox.innerText = "Jimmy says: " + hint;
       hintBox.style.display = "block";
     
-      // Disable the lifeline visually and functionally
-      const phoneBtn = document.getElementById("phone-btn");
-      phoneBtn.parentElement.setAttribute("disabled", true);
-    }
-
-
-    function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
+      // Disable lifeline visually and functionally
+      const phoneBtn = document.getElementById("phone-btn").parentElement;
+      phoneBtn.setAttribute("disabled", true);
     }
 
     function getRandomInt(min, max) {
