@@ -155,6 +155,13 @@
       color: #444;
       box-shadow: none;
     }
+    
+    .lifeline-item[disabled] img {
+      filter: grayscale(100%) brightness(60%);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
 
     #give-up-btn {
       margin-top: 1em;
@@ -475,7 +482,8 @@
         btn.disabled = true;
       });
 
-      document.getElementById("fifty-btn").disabled = true;
+      document.getElementById("fifty-btn").parentElement.setAttribute("disabled", true);
+
     }
 
     function askAudience() {
@@ -499,7 +507,8 @@
         fillBar.style.width = vote.percent + "%";
       });
     
-      document.getElementById("audience-btn").disabled = true;
+      document.getElementById("audience-btn").parentElement.setAttribute("disabled", true);
+
     }
 
 
@@ -508,8 +517,12 @@
       const hintBox = document.getElementById("hint-box");
       hintBox.innerText = "Friend says: " + hint;
       hintBox.style.display = "block";
-      document.getElementById("phone-btn").disabled = true;
+    
+      // Disable the lifeline visually and functionally
+      const phoneBtn = document.getElementById("phone-btn");
+      phoneBtn.parentElement.setAttribute("disabled", true);
     }
+
 
     function shuffle(arr) {
       for (let i = arr.length - 1; i > 0; i--) {
