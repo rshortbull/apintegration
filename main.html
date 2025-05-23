@@ -337,47 +337,135 @@
   <div class="tracker" id="progress-tracker"></div>
 
   <script>
-    const questions = [
-      {
-        text: "What is the integral of x dx?",
-        answers: ["1/2 x^2 + C", "x + C", "ln|x| + C", "x^2 + C"],
-        correct: "1/2 x^2 + C",
-        hint: "Use power rule of integration."
-      },
-      {
-        text: "What is ∫cos(x) dx?",
-        answers: ["sin(x) + C", "-cos(x) + C", "-sin(x) + C", "cos(x) + C"],
-        correct: "sin(x) + C",
-        hint: "Derivative of sin(x) is cos(x)."
-      },
-      {
-        text: "∫1/x dx equals...",
-        answers: ["ln|x| + C", "x ln|x| - x + C", "1/(x^2) + C", "x^2/2 + C"],
-        correct: "ln|x| + C",
-        hint: "Think of the natural logarithm."
-      },
-      {
-        text: "Which of these is an antiderivative of e^x?",
-        answers: ["e^x + C", "x * e^x + C", "ln(x) + C", "1/e^x + C"],
-        correct: "e^x + C",
-        hint: "Derivative of e^x is e^x."
-      },
-      {
-        text: "∫sec^2(x) dx equals...",
-        answers: ["tan(x) + C", "sec(x)tan(x) + C", "sin(x) + C", "ln|cos(x)| + C"],
-        correct: "tan(x) + C",
-        hint: "What function's derivative is sec²(x)?"
-      }
-    ];
+    const categories = {
+      sports: [
+        {
+          question: "Which country won the FIFA World Cup in 2018?",
+          answers: ["Germany", "Brazil", "France", "Argentina"],
+          correct: "France",
+          hint: "The final was against Croatia."
+        },
+        {
+          question: "How many players are on a basketball team on the court?",
+          answers: ["5", "6", "7", "4"],
+          correct: "5",
+          hint: "It's a team of five."
+        },
+        {
+          question: "What sport is Serena Williams famous for?",
+          answers: ["Tennis", "Basketball", "Golf", "Soccer"],
+          correct: "Tennis",
+          hint: "She serves aces."
+        }
+      ],
+      cars: [
+        {
+          question: "What company produces the Mustang?",
+          answers: ["Chevrolet", "Toyota", "Ford", "Dodge"],
+          correct: "Ford",
+          hint: "American automaker."
+        },
+        {
+          question: "Which country is known for Ferrari?",
+          answers: ["France", "Germany", "Italy", "Japan"],
+          correct: "Italy",
+          hint: "Same country as pasta."
+        },
+        {
+          question: "What does 'EV' stand for in the automotive industry?",
+          answers: ["Electric Vehicle", "Engine Valve", "Eco Van", "Enhanced Vision"],
+          correct: "Electric Vehicle",
+          hint: "No gas needed."
+        }
+      ],
+      math: [
+        {
+          question: "What is the integral of x dx?",
+          answers: ["x^2", "x^2/2", "1/x", "ln(x)"],
+          correct: "x^2/2",
+          hint: "Power rule!"
+        },
+        {
+          question: "What is 8 × 7?",
+          answers: ["54", "56", "64", "58"],
+          correct: "56",
+          hint: "It's in the 50s."
+        },
+        {
+          question: "What is 100 divided by 4?",
+          answers: ["20", "25", "30", "15"],
+          correct: "25",
+          hint: "Quarter of 100."
+        }
+      ],
+      animals: [
+        {
+          question: "Which animal is known as the king of the jungle?",
+          answers: ["Tiger", "Elephant", "Lion", "Leopard"],
+          correct: "Lion",
+          hint: "Big cat with a mane."
+        },
+        {
+          question: "Which animal is the largest mammal?",
+          answers: ["Elephant", "Blue Whale", "Giraffe", "Rhino"],
+          correct: "Blue Whale",
+          hint: "Lives in the ocean."
+        },
+        {
+          question: "How many legs does a spider have?",
+          answers: ["6", "8", "10", "12"],
+          correct: "8",
+          hint: "More than insects."
+        }
+      ],
+      school: [
+        {
+          question: "What is the chemical symbol for water?",
+          answers: ["H2O", "O2", "CO2", "HO2"],
+          correct: "H2O",
+          hint: "Two hydrogen, one oxygen."
+        },
+        {
+          question: "Who wrote 'Romeo and Juliet'?",
+          answers: ["Shakespeare", "Hemingway", "Dickens", "Poe"],
+          correct: "Shakespeare",
+          hint: "Famous English playwright."
+        },
+        {
+          question: "What planet is known as the Red Planet?",
+          answers: ["Venus", "Saturn", "Mars", "Jupiter"],
+          correct: "Mars",
+          hint: "Named after a Roman god."
+        }
+      ]
+    };
 
     let currentQuestion = 0;
     let selectedButton = null;
     let correctAnswers = 0;
+    
+    let questions = [];
+
+    function selectQuestions() {
+      questions = [
+        getRandomQuestion(categories.sports),
+        getRandomQuestion(categories.cars),
+        getRandomQuestion(categories.math),
+        getRandomQuestion(categories.animals),
+        getRandomQuestion(categories.school)
+      ];
+    }
+    
+    function getRandomQuestion(categoryArray) {
+      const index = Math.floor(Math.random() * categoryArray.length);
+      return categoryArray[index];
+    }
 
     function startGame() {
       document.getElementById("start-screen").style.display = "none";
       document.getElementById("quiz-container").style.display = "flex";
       document.getElementById("result-screen").style.display = "none";
+      selectQuestions();
       currentQuestion = 0;
       correctAnswers = 0;
       selectedButton = null;
@@ -388,7 +476,7 @@
 
     function showQuestion() {
       const q = questions[currentQuestion];
-      document.getElementById("question-text").innerText = q.text;
+      document.getElementById("question-text").innerText = q.question;
       const buttons = document.querySelectorAll("#answer-buttons button");
     
       buttons.forEach((btn, index) => {
@@ -441,37 +529,35 @@
     }
 
 
-    
-      
+  function showResult() {
+    document.getElementById("quiz-container").style.display = "none";
+    document.getElementById("result-screen").style.display = "flex";
+    document.getElementById("final-score-text").innerText =
+      `You answered ${correctAnswers} out of ${questions.length} questions correctly!`;
+  }
 
-    function showResult() {
-      document.getElementById("quiz-container").style.display = "none";
-      document.getElementById("result-screen").style.display = "flex";
-      document.getElementById("final-score-text").innerText =
-        `You answered ${correctAnswers} out of ${questions.length} correctly.`;
-    }
+  function restartGame() {
+    // Reset lifelines
+    document.getElementById("fifty-btn").parentElement.removeAttribute("disabled");
+    document.getElementById("audience-btn").parentElement.removeAttribute("disabled");
+    document.getElementById("phone-btn").parentElement.removeAttribute("disabled");
 
-    function restartGame() {
-      document.getElementById("result-screen").style.display = "none";
-      document.getElementById("start-screen").style.display = "flex";
-      const tracker = document.getElementById("progress-tracker");
-      tracker.innerHTML = "";
-    }
+    document.getElementById("start-screen").style.display = "flex";
+    document.getElementById("quiz-container").style.display = "none";
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("progress-tracker").innerHTML = '';
+  }
 
-    function giveUp() {
-      showResult();
+  function createTracker() {
+    const tracker = document.getElementById("progress-tracker");
+    tracker.innerHTML = '';
+    for (let i = 0; i < questions.length; i++) {
+      const box = document.createElement("div");
+      box.innerText = i + 1;
+      tracker.appendChild(box);
     }
+  }
 
-    function createTracker() {
-      const tracker = document.getElementById("progress-tracker");
-      tracker.innerHTML = "";
-      for (let i = 0; i < questions.length; i++) {
-        const box = document.createElement("div");
-        box.classList.add("tracker-box");
-        box.innerText = (i + 1); // Number the box 1 to 5
-        tracker.appendChild(box);
-      }
-    }
 
 
     function useFiftyFifty() {
