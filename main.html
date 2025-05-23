@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Millionaire Quiz Game</title>
+  <title>Ms. Hanafi's Ap Integration Test</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Palatino+Linotype&display=swap');
 
@@ -214,8 +214,8 @@
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      color: white;
+      background-color: #313fbd; /* updated bg */
+      color: white; /* white text */
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -234,20 +234,28 @@
     .result-screen h2 {
       font-size: 3rem;
       font-weight: 900;
-      color: #ffd700;
+      color: white; /* changed from #ffd700 */
       margin-bottom: 1em;
     }
-
+    
+    
     .start-screen button,
     .result-screen button {
       padding: 1em 2em;
       font-size: 1.2em;
-      background: linear-gradient(45deg, #ff6a00, #ee0979);
+      background-color: white;
+      color: black;
       border: none;
       border-radius: 12px;
-      color: white;
       cursor: pointer;
       transition: transform 0.2s;
+      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+    }
+
+    .start-screen button:hover,
+    .result-screen button:hover {
+      transform: scale(1.1);
+      background-color: #e0e0e0; /* subtle hover */
     }
     
     .lifeline-item {
@@ -283,17 +291,11 @@
       pointer-events: none; /* so text doesn’t block clicks */
       user-select: none;
     }
-
-
-    .start-screen button:hover,
-    .result-screen button:hover {
-      transform: scale(1.1);
-    }
   </style>
 </head>
 <body>
   <div class="start-screen" id="start-screen">
-    <h1>Who Wants to Be a Millionaire?</h1>
+    <h1>Who Wants to Get a Five?</h1>
     <button onclick="startGame()">Start Game</button>
   </div>
 
@@ -518,35 +520,53 @@
         const trackerBoxes = document.getElementById("progress-tracker").children;
         trackerBoxes[currentQuestion].classList.add("correct");
         correctAnswers++;
-      }
     
-      currentQuestion++;
-      if (currentQuestion < questions.length) {
-        showQuestion();
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+          showQuestion();
+        } else {
+          // All questions answered correctly
+          showResult(`Congrats! You answered all ${correctAnswers} questions correctly!`);
+        }
       } else {
-        showResult();
+        // Wrong answer - end game immediately
+        showResult(`Wrong answer! You got ${correctAnswers} right.<br>Correct answer: ${correctText}`);
       }
     }
+    
+    function showResult(message) {
+      document.getElementById("quiz-container").style.display = "none";
+      document.getElementById("result-screen").style.display = "flex";
+      document.getElementById("progress-tracker").style.display = "none";
 
-
-  function showResult() {
-    document.getElementById("quiz-container").style.display = "none";
-    document.getElementById("result-screen").style.display = "flex";
-    document.getElementById("final-score-text").innerText =
-      `You answered ${correctAnswers} out of ${questions.length} questions correctly!`;
-  }
-
-  function restartGame() {
-    // Reset lifelines
-    document.getElementById("fifty-btn").parentElement.removeAttribute("disabled");
-    document.getElementById("audience-btn").parentElement.removeAttribute("disabled");
-    document.getElementById("phone-btn").parentElement.removeAttribute("disabled");
-
-    document.getElementById("start-screen").style.display = "flex";
-    document.getElementById("quiz-container").style.display = "none";
-    document.getElementById("result-screen").style.display = "none";
-    document.getElementById("progress-tracker").innerHTML = '';
-  }
+    
+      // If a custom message passed, show it, else fallback to default
+      if (message) {
+        document.getElementById("final-score-text").innerHTML = message;
+      } else {
+        document.getElementById("final-score-text").innerText =
+          `You answered ${correctAnswers} out of ${questions.length} questions correctly!`;
+      }
+    }
+    
+    function restartGame() {
+      // Reset lifelines
+      document.getElementById("fifty-btn").parentElement.removeAttribute("disabled");
+      document.getElementById("audience-btn").parentElement.removeAttribute("disabled");
+      document.getElementById("phone-btn").parentElement.removeAttribute("disabled");
+    
+      // Reset counters
+      currentQuestion = 0;
+      correctAnswers = 0;
+    
+      // Clear tracker
+      document.getElementById("progress-tracker").innerHTML = '';
+    
+      // Show start screen, hide others
+      document.getElementById("start-screen").style.display = "flex";
+      document.getElementById("quiz-container").style.display = "none";
+      document.getElementById("result-screen").style.display = "none";
+    }
 
   function createTracker() {
     const tracker = document.getElementById("progress-tracker");
