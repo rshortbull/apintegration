@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ms. Hanafi's Ap Integration Test</title>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Palatino+Linotype&display=swap');
 
@@ -36,7 +41,6 @@
       width: 100%;
       margin-bottom: 2em;
       text-align: center;
-      
     }
 
     #question-text {
@@ -64,7 +68,7 @@
       transition: background 0.3s, transform 0.2s;
       overflow: hidden; /* to clip the fill bar */
     }
-    
+
     .answers button .fill-bar {
       position: absolute;
       top: 0;
@@ -76,7 +80,7 @@
       pointer-events: none;
       z-index: 0;
     }
-    
+
     .answers button span.answer-text {
       position: relative;
       z-index: 1;
@@ -155,7 +159,7 @@
       color: #444;
       box-shadow: none;
     }
-    
+
     .lifeline-item[disabled] img {
       filter: grayscale(100%) brightness(60%);
       cursor: not-allowed;
@@ -185,7 +189,7 @@
       background: #e0e0e0;
       border-top: 2px solid #ccc;
     }
-    
+
     .tracker div {
       width: 40px;
       height: 40px;
@@ -201,15 +205,14 @@
       transition: background-color 0.3s;
       user-select: none;
     }
-    
+
     .tracker div.correct {
       background-color: #2a76ff; /* blue for correct */
       color: #fff;
     }
 
 
-    .start-screen,
-    .result-screen {
+    .start-screen {
       position: absolute;
       top: 0; left: 0;
       width: 100%;
@@ -224,38 +227,46 @@
       padding: 2em;
       z-index: 10;
     }
-    
+
     .result-screen {
       position: absolute;
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background-color: white; /* updated bg */
-      color: black; /* white text */
+      background-color: white;
+      color: black;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start; /* Changed */
       align-items: center;
       text-align: center;
-      padding: 2em;
+      padding: 0; /* Changed to allow full-width images */
       z-index: 10;
+      overflow-y: auto; /* Allow scrolling if content exceeds viewport */
     }
-    
-    
+
+
     .lifeline-item[disabled] {
       pointer-events: none;
       opacity: 0.6;
     }
 
-    .start-screen h1,
-    .result-screen h2 {
+    .start-screen h1 {
       font-size: 3rem;
       font-weight: 900;
       color: white; /* changed from #ffd700 */
       margin-bottom: 1em;
     }
     
-    
+    .result-screen h2 { /* Styling for "Game Over" */
+        font-size: 2.5rem; /* Adjusted size */
+        font-weight: 900;
+        color: black;
+        margin-top: 1.5em; /* Added margin for spacing from top image */
+        margin-bottom: 0.5em; /* Adjusted margin */
+    }
+
+
     .start-screen button{
       padding: 1em 2em;
       font-size: 1.2em;
@@ -272,8 +283,8 @@
       transform: scale(1.1);
       background-color: #e0e0e0; /* subtle hover */
     }
-    
-    .result-screen button {
+
+    .result-screen button { /* Play Again button */
       background-color: #313fbd;
       color: white;
       border: none;
@@ -283,14 +294,16 @@
       cursor: pointer;
       font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
       transition: transform 0.2s, background-color 0.3s;
+      margin-top: 1.5em; /* Spacing above button */
+      margin-bottom: 2em; /* Spacing below button */
     }
-    
+
     .result-screen button:hover {
       background-color: #1f2c8f; /* slightly darker on hover */
       transform: scale(1.05);
     }
 
-    
+
     .lifeline-item {
       display: flex;
       flex-direction: column;
@@ -298,23 +311,23 @@
       cursor: pointer;
       user-select: none;
     }
-    
+
     .lifeline-item img {
       height: 60px;
       transition: transform 0.2s, filter 0.3s;
     }
-    
+
     .lifeline-item:hover img:not([disabled]) {
       transform: scale(1.1);
       filter: drop-shadow(0 0 5px #00aaff);
     }
-    
+
     .lifeline-item[disabled] img {
       filter: grayscale(100%) brightness(60%);
       cursor: not-allowed;
       pointer-events: none;
     }
-    
+
     .lifeline-label {
       margin-top: 0.3em;
       font-family: 'Palatino Linotype', serif;
@@ -324,6 +337,35 @@
       pointer-events: none; /* so text doesn’t block clicks */
       user-select: none;
     }
+
+    .result-banner-img {
+        width: 100%;
+        height: auto;
+        max-height: 25vh;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        margin-bottom: 0; /* Removed bottom margin to be closer to score image */
+    }
+
+    .score-level-img {
+        width: 100%;
+        height: auto;
+        max-height: 35vh; /* Adjust as needed, can be different from banner */
+        object-fit: contain; /* Use contain to ensure whole image is visible */
+        object-position: center;
+        display: block;
+        margin-top: 0; /* remove any top margin */
+        margin-bottom: 1.5em; /* Spacing below score image */
+    }
+
+    #correct-answer-text-result { /* Renamed to avoid conflict */
+        font-weight: bold;
+        margin-top: 1em; /* Spacing above text */
+        margin-bottom: 1em; /* Spacing below text */
+        padding: 0 1em; /* Add some horizontal padding */
+    }
+
   </style>
 </head>
 <body>
@@ -340,11 +382,11 @@
       </div>
       <div class="lifeline-item" onclick="askAudience()">
         <img id="audience-btn" src="https://cdn.sanity.io/images/7i1ps9pf/production/84c9406f1c438f37fbd6cc07730cd6c43b159b63-5644x3763.jpg" alt="Ask the Audience" title="Ask the Audience" />
-        <div class="lifeline-label">Ask the Procters</div>
+        <div class="lifeline-label">Ask the Proctors</div>
       </div>
       <div class="lifeline-item" onclick="phoneFriend()">
         <img id="phone-btn" src="https://media.istockphoto.com/id/1325458178/photo/whispering-the-right-answer.jpg?s=612x612&w=0&k=20&c=ktxzDRGE92e82T34yfjRU7GG8W6DAJA5hZyji8Pn3yg=" alt="Phone a Friend" title="Phone a Friend" />
-        <div class="lifeline-label">Whisper to a Freind</div>
+        <div class="lifeline-label">Whisper to a Friend</div>
       </div>
     </div>
 
@@ -359,136 +401,226 @@
       </div>
       <button id="check-answer-btn" onclick="checkAnswer()">Check Answer</button>
       <div class="hint" id="hint-box">Hint appears here</div>
-      
     </div>
   </div>
 
   <div class="result-screen" id="result-screen" style="display: none;">
-    <div id="result-screen" class="result-screen" style="background-color: white; color: black;">
-      <img src="https://raw.githubusercontent.com/rshortbull/plsmshaniafigivemeanaincalc/refs/heads/main/endscreentop.jpg" 
-           alt="End Screen Banner" 
-           style="width: 100%; max-width: 547px; height: auto; margin-bottom: 1.5em;" />
-      <h2>Game Over</h2>
-      <p id="final-score-text"></p>
-      <p id="correct-answer-text" style="font-weight: bold;"></p>
-      <button onclick="startGame()">Play Again</button>
-    </div>
-  </div>
+      <img src="https://raw.githubusercontent.com/rshortbull/plsmshaniafigivemeanaincalc/refs/heads/main/endscreentop.jpg"
+           alt="End Screen Banner"
+           class="result-banner-img" />
+
+      <img id="score-level-image" src="" alt="Score Level" class="score-level-img" />
+
+      <h2>Thank You for taking the Blue Book Digital AP Exam. Please Rate Your Experience</h2>
+      <p id="correct-answer-text-result"></p>
+      <button onclick="restartGame()">Play Again</button> </div>
+
 
   <div class="tracker" id="progress-tracker"></div>
 
   <script>
     const categories = {
-      sports: [
+      sports: [ // This category already uses correctIndex and LaTeX
         {
-          question: "Which country won the FIFA World Cup in 2018?",
-          answers: ["Germany", "Brazil", "France", "Argentina"],
-          correct: "France",
-          hint: "The final was against Croatia."
+          question: "\\[ \\int \\frac{x^{2}+4}{x^{2}}\\,dx \\]",
+          answers: [
+            "\\( x + \\frac{4}{x} + C \\)",
+            "\\( x + 4 + C \\)",
+            "\\( \\frac{4}{x} + x + C \\)",
+            "\\( x - \\frac{4}{x} + C \\)"
+          ],
+          correctIndex: 3,
+          hint: "Simplify the integrand first: 1 + 4x<sup>-2</sup>"
         },
         {
-          question: "How many players are on a basketball team on the court?",
-          answers: ["5", "6", "7", "4"],
-          correct: "5",
-          hint: "It's a team of five."
+          question: "\\[ \\int \\cos(3x)\\,dx \\]",
+          answers: [
+            "\\( \\frac{1}{3}\\sin(3x) + C \\)",
+            "\\( \\sin(3x) + C \\)",
+            "\\( \\frac{1}{3}\\sin(3x) \\)",
+            "\\( -\\frac{1}{3}\\sin(3x) + C \\)"
+          ],
+          correctIndex: 0,
+          hint: "Use u-substitution with u = 3x."
         },
         {
-          question: "What sport is Serena Williams famous for?",
-          answers: ["Tennis", "Basketball", "Golf", "Soccer"],
-          correct: "Tennis",
-          hint: "She serves aces."
+          question: "\\[ \\int \\left( \\frac{8}{x} - \\frac{5}{x^{2}} + \\frac{6}{x^{3}} \\right) dx \\]",
+          answers: [
+            "\\( 8\\ln|x| + \\frac{5}{x} - \\frac{3}{x^{2}} + C \\)", // Original choice, index 0
+            "\\( 8\\ln|x| - \\frac{5}{x} - \\frac{3}{x^{2}} + C \\)", // Corrected based on typical integration, index 1
+            "\\( 8\\ln|x| + \\frac{5}{x} + \\frac{3}{x^{2}} + C \\)", // index 2
+            "\\( 8\\ln|x| + \\frac{6}{x^{2}} + C \\)"             // index 3
+          ],
+          
+          correctIndex: 0, // Corrected based on calculation
+          hint: "Rewrite terms with negative exponents (e.g., 1/x<sup>n</sup> = x<sup>-n</sup>) and integrate term by term."
         }
       ],
-      cars: [
+
+
+      cars: [ // Updated to use correctIndex
         {
-          question: "What company produces the Mustang?",
-          answers: ["Chevrolet", "Toyota", "Ford", "Dodge"],
-          correct: "Ford",
-          hint: "American automaker."
+          question: "\\[ \\int \\left( \\left( 3x^{2}+4 \\right )^{3} \\times 6x \\right ) dx \\]",
+          answers: [
+            "\\( \\left (3x^4+4  \\right )^{3}\\left ( 2x^{2}+4 \\right )+c \\)",          // Incorrect
+            "\\( \\frac{1}{4}\\left (3x^4+4  \\right )^{4}+c \\)",                          // ✅ Correct
+            "\\( -\\frac{1}{4}\\left (3x^4+4  \\right )^{4}+C \\)",                         // Incorrect
+            "\\( \\frac{1}{4}\\left (3x^4+4  \\right )^{4} \\)"                             // Incorrect (missing +c)
+          ],
+          correctIndex: 1,
+          hint: "Try substitution: let \\( u = 3x^2 + 4 \\), then integrate using the chain rule."
         },
         {
-          question: "Which country is known for Ferrari?",
-          answers: ["France", "Germany", "Italy", "Japan"],
-          correct: "Italy",
-          hint: "Same country as pasta."
+          question: "\\[ \\int_{0}^{\\frac{\\pi}{2}} e^{\\cos x} \\cdot \\sin(x) \\, dx \\]",
+          answers: [
+            "\\( e + 2 \\)",      // Incorrect
+            "\\( e + 1 \\)",      // Incorrect
+            "\\( e - 1 \\)",      // ✅ Correct
+            "\\( e - 2 \\)"       // Incorrect
+          ],
+          correctIndex: 2,
+          hint: "Let \\( u = \\cos(x) \\). Adjust bounds accordingly and use substitution."
         },
         {
-          question: "What does 'EV' stand for in the automotive industry?",
-          answers: ["Electric Vehicle", "Engine Valve", "Eco Van", "Enhanced Vision"],
-          correct: "Electric Vehicle",
-          hint: "No gas needed."
+          question: "\\[ \\int \\frac{e^{x}}{e^{x}+1} \\, dx \\]",
+          answers: [
+            "\\( e^{x} + c \\)",               // Incorrect
+            "\\( \\frac{1}{e^{x}} + c \\)",    // Incorrect
+            "\\( \\ln|e^{x}+1| + c \\)",       // ✅ Correct
+            "\\( \\ln|e^{x}+1| \\)"            // Incorrect (missing +c)
+          ],
+          correctIndex: 2,
+          hint: "Try substitution: let \\( u = e^x + 1 \\)."
         }
       ],
-      math: [
+
+
+      math: [ // Updated to use correctIndex (these are plain text math, not LaTeX)
         {
-          question: "What is the integral of x dx?",
-          answers: ["x^2", "x^2/2", "1/x", "ln(x)"],
-          correct: "x^2/2",
-          hint: "Power rule!"
+          question: "\\[ \\int x^{2} \\cdot \\cos(x) \\, dx \\]",
+          answers: [
+            "\\( x^{2}\\sin(x) - 2x\\cos(x) + 2\\sin(x) + c \\)",      // Incorrect
+            "\\( x^{2}\\cos(x) + 2x\\cos(x) - 2\\sin(x) + c \\)",       // ✅ Correct
+            "\\( x^{2}\\sin(x) - 2\\cos(x) + c \\)",                   // Incorrect
+            "\\( x^{2}\\sin(x) + 2\\cos(x) + 2\\sin(x) + c \\)"         // Incorrect
+          ],
+          correctIndex: 1,
+          hint: "Use integration by parts twice. Let \\( u = x^2 \\) and \\( dv = \\cos(x)dx \\)."
         },
         {
-          question: "What is 8 × 7?",
-          answers: ["54", "56", "64", "58"],
-          correct: "56",
-          hint: "It's in the 50s."
+          question: "\\[ \\int e^{x} \\cdot \\sin(x) \\, dx \\]",
+          answers: [
+            "\\( -\\frac{1}{2}e^{x}\\left ( \\sin(x)-\\cos(x) \\right ) + c \\)",     // Incorrect
+            "\\( \\frac{1}{2}e^{x}\\left ( \\sin(x)+\\cos(x) \\right ) + c \\)",      // Incorrect
+            "\\( \\frac{1}{2}e^{x}\\left ( \\cos(x)-\\sin(x) \\right ) + c \\)",      // Incorrect
+            "\\( \\frac{1}{2}e^{x}\\left ( \\sin(x)-\\cos(x) \\right ) + c \\)"       // ✅ Correct
+          ],
+          correctIndex: 3,
+          hint: "Use integration by parts twice or solve the associated second-order differential equation."
         },
         {
-          question: "What is 100 divided by 4?",
-          answers: ["20", "25", "30", "15"],
-          correct: "25",
-          hint: "Quarter of 100."
+          question: "\\[ \\int_{1}^{\\infty} \\frac{\\ln|x|}{x^7} \\, dx \\]",
+          answers: [
+            "\\( \\frac{1}{36} \\)",   // ✅ Correct
+            "\\( \\frac{1}{12} \\)",   // Incorrect
+            "\\( \\frac{1}{24} \\)",   // Incorrect
+            "\\( \\frac{1}{18} \\)"    // Incorrect
+          ],
+          correctIndex: 0,
+          hint: "Use integration by parts with \\( u = \\ln x \\), \\( dv = x^{-7} dx \\)."
         }
       ],
-      animals: [
+
+
+      animals: [ // Updated to use correctIndex
         {
-          question: "Which animal is known as the king of the jungle?",
-          answers: ["Tiger", "Elephant", "Lion", "Leopard"],
-          correct: "Lion",
-          hint: "Big cat with a mane."
+          question: "\\[ \\int \\sin^{3}(x) \\cdot \\cos^{5}(x) \\, dx \\]",
+          answers: [
+            "\\( \\frac{1}{6}\\cos^{6}(x) - \\frac{1}{8}\\sin^{8}(x) + c \\)",                             // Incorrect
+            "\\( -\\frac{1}{8}\\cos^{4}(x) + \\frac{1}{6}\\cos^{6}(x) - \\frac{1}{10}\\cos^{8}(x) + c \\)", // Incorrect
+            "\\( -\\frac{1}{6}\\cos^{6}(x) + \\frac{1}{8}\\sin^{8}(x) + c \\)",                            // ✅ Correct
+            "\\( -\\frac{1}{6}\\cos^{6}(x) \\cdot \\sin^{2}(x) + c \\)"                                    // Incorrect
+          ],
+          correctIndex: 2,
+          hint: "Use the identity \\( \\sin^3(x) = (1 - \\cos^2(x)) \\cdot \\sin(x) \\), then substitute \\( u = \\cos(x) \\)."
         },
         {
-          question: "Which animal is the largest mammal?",
-          answers: ["Elephant", "Blue Whale", "Giraffe", "Rhino"],
-          correct: "Blue Whale",
-          hint: "Lives in the ocean."
+          question: "\\[ \\int \\frac{1}{a^{2} + b^{2}x^{2}} \\, dx \\]",
+          answers: [
+            "\\( \\frac{1}{ab} \\arctan\\left( \\frac{a}{b}x \\right) + c \\)",     // Incorrect
+            "\\( \\frac{1}{ab} \\arctan\\left( \\frac{b}{a}x \\right) + c \\)",     // ✅ Correct
+            "\\( \\arctan\\left( \\frac{b}{a}x \\right) + c \\)",                   // Incorrect
+            "\\( \\frac{a}{b} \\arctan\\left( \\frac{b}{a}x \\right) + c \\)"       // Incorrect
+          ],
+          correctIndex: 1,
+          hint: "Use the standard form: \\( \\int \\frac{1}{a^2 + u^2} \\, du = \\frac{1}{a} \\arctan\\left( \\frac{u}{a} \\right) + C \\)"
         },
         {
-          question: "How many legs does a spider have?",
-          answers: ["6", "8", "10", "12"],
-          correct: "8",
-          hint: "More than insects."
+          question: "\\[ \\int \\cos(11m) \\cdot \\sin(3m) \\, dm \\]",
+          answers: [
+            "\\( -\\frac{1}{16}\\cos(8m) + \\frac{1}{28}\\cos(14m) + c \\)",      // Incorrect
+            "\\( \\frac{1}{16}\\cos(8m) - \\frac{1}{28}\\sin(14m) + c \\)",       // Incorrect
+            "\\( \\frac{1}{2}\\cos(8m) - \\frac{1}{2}\\cos(14m) + c \\)",         // Incorrect
+            "\\( \\frac{1}{16}\\cos(8m) - \\frac{1}{28}\\cos(14m) + c \\)"        // ✅ Correct
+          ],
+          correctIndex: 3,
+          hint: "Use product-to-sum identities: \\( \\cos(A)\\sin(B) = \\frac{1}{2}[\\sin(A+B) - \\sin(A-B)] \\), then integrate."
         }
       ],
-      school: [
+      school: [ // Updated to use correctIndex
         {
-          question: "What is the chemical symbol for water?",
-          answers: ["H2O", "O2", "CO2", "HO2"],
-          correct: "H2O",
-          hint: "Two hydrogen, one oxygen."
+          question: "\\[ \\int \\frac{2 + w^{4}}{w^{3} + 9w} \\, dw \\]",
+          answers: [
+            "\\( \\frac{1}{2}w^{2} + \\frac{2}{9}\\ln|w| - \\frac{83}{18}\\ln|w^{2} + 9| + c \\)",        // ✅ Correct
+            "\\( -\\frac{1}{2}w^{2} - \\frac{2}{9}\\ln|w| + \\frac{83}{18}\\ln|w^{2} + 9| + c \\)",       // Incorrect
+            "\\( w^{2} + \\ln|w| - \\ln|w^{2} + 9| + c \\)",                                              // Incorrect
+            "\\( \\frac{2}{9}w^{2} + \\frac{83}{18}\\ln|w| - \\frac{1}{2}\\ln|w^{2} + 9| + c \\)"         // Incorrect
+          ],
+          correctIndex: 0,
+          hint: "Use polynomial long division first, then partial fraction decomposition on the rational part."
+
         },
         {
-          question: "Who wrote 'Romeo and Juliet'?",
-          answers: ["Shakespeare", "Hemingway", "Dickens", "Poe"],
-          correct: "Shakespeare",
-          hint: "Famous English playwright."
+          question: "\\[ \\int_{0}^{\\pi} x^{2} \\cdot \\cos(4x) \\, dx \\]",
+          answers: [
+            "\\( -\\frac{\\pi}{8} \\)",     // Incorrect
+            "\\( \\frac{\\pi}{8} \\)",      // ✅ Correct
+            "\\( \\frac{\\pi}{16} \\)",     // Incorrect
+            "\\( \\frac{4}{\\pi} \\)"       // Incorrect
+          ],
+          correctIndex: 1,
+          hint: "Use integration by parts twice. Let \\( u = x^2 \\), then \\( dv = \\cos(4x)dx \\)."
         },
         {
-          question: "What planet is known as the Red Planet?",
-          answers: ["Venus", "Saturn", "Mars", "Jupiter"],
-          correct: "Mars",
-          hint: "Named after a Roman god."
+          question: "\\[ \\int \\frac{-2x + 4}{x^{3} - x^{2} + x - 1} \\, dx \\]",
+          answers: [
+            "\\( \\ln|x^{2}+1| - \\arctan(x) + \\ln(x - 1) + c \\)",                        // Incorrect
+            "\\( \\frac{1}{2}\\ln|x^{2}+1| + 3\\arctan(x) - \\ln|x - 1| + c \\)",           // Incorrect
+            "\\( -\\frac{1}{2}\\ln|x^{2}+1| - 3\\arctan(x) + \\ln|x - 1| + c \\)",          // ✅ Correct
+            "\\( \\ln|x^{2}+1| - \\arctan(x) + 2\\ln|x + 1| + c \\)"                        // Incorrect
+          ],
+          correctIndex: 2,
+          hint: "Factor the denominator and use partial fractions. Some terms may involve \\( \\arctan(x) \\) and logarithms."
         }
       ]
     };
 
-    let currentQuestion = 0;
+    const scoreImages = [
+        "https://raw.githubusercontent.com/rshortbull/plsmshaniafigivemeanaincalc/refs/heads/main/score1.png", // For 0-1 correct (adjust logic if needed)
+        "https://raw.githubusercontent.com/rshortbull/plsmshaniafigivemeanaincalc/refs/heads/main/score2.png", // For 2 correct
+        "https://raw.githubusercontent.com/rshortbull/plsmshaniafigivemeanaincalc/refs/heads/main/score3.png", // For 3 correct
+        "https://raw.githubusercontent.com/rshortbull/plsmshaniafigivemeanaincalc/refs/heads/main/score4.png", // For 4 correct
+        "https://raw.githubusercontent.com/rshortbull/plsmshaniafigivemeanaincalc/refs/heads/main/score5.png"  // For 5 correct
+    ];
+
+
+    let currentQuestionIndex = 0; // Renamed from currentQuestion to avoid confusion with question object
     let selectedButton = null;
-    let correctAnswers = 0;
-    
-    let questions = [];
+    let correctAnswersCount = 0; // Renamed from correctAnswers
+    let questionsArray = []; // Renamed from questions
 
     function selectQuestions() {
-      questions = [
+      questionsArray = [
         getRandomQuestion(categories.sports),
         getRandomQuestion(categories.cars),
         getRandomQuestion(categories.math),
@@ -496,7 +628,7 @@
         getRandomQuestion(categories.school)
       ];
     }
-    
+
     function getRandomQuestion(categoryArray) {
       const index = Math.floor(Math.random() * categoryArray.length);
       return categoryArray[index];
@@ -506,40 +638,50 @@
       document.getElementById("start-screen").style.display = "none";
       document.getElementById("quiz-container").style.display = "flex";
       document.getElementById("result-screen").style.display = "none";
+      document.getElementById("progress-tracker").style.display = "flex";
       selectQuestions();
-      currentQuestion = 0;
-      correctAnswers = 0;
+      currentQuestionIndex = 0;
+      correctAnswersCount = 0;
       selectedButton = null;
+
+      document.getElementById("fifty-btn").parentElement.removeAttribute("disabled");
+      document.getElementById("audience-btn").parentElement.removeAttribute("disabled");
+      document.getElementById("phone-btn").parentElement.removeAttribute("disabled");
+      document.getElementById("fifty-btn").style.filter = "";
+      document.getElementById("audience-btn").style.filter = "";
+      document.getElementById("phone-btn").style.filter = "";
 
       createTracker();
       showQuestion();
     }
 
     function showQuestion() {
-      const q = questions[currentQuestion];
-      document.getElementById("question-text").innerText = q.question;
-      const buttons = document.querySelectorAll("#answer-buttons button");
-    
-      buttons.forEach((btn, index) => {
+      if (currentQuestionIndex >= questionsArray.length) {
+          showResult(true); // All questions answered
+          return;
+      }
+      const q = questionsArray[currentQuestionIndex];
+      document.getElementById("question-text").innerHTML = q.question; // For MathJax
+
+      const answerButtons = document.querySelectorAll("#answer-buttons button");
+
+      answerButtons.forEach((btn, index) => {
         btn.classList.remove("selected", "hidden");
         btn.disabled = false;
-        // Reset fill bar width:
-        let fillBar = btn.querySelector(".fill-bar");
-        if (!fillBar) {
-          fillBar = document.createElement("div");
-          fillBar.classList.add("fill-bar");
-          btn.prepend(fillBar);
-        }
-        fillBar.style.width = '0';
-    
-        // Wrap answer text in span for layering
-        btn.innerHTML = `<span class="answer-text">${q.answers[index]}</span>`;
+        btn.setAttribute('data-index', index); // Crucial for checkAnswer
+
+        const answerText = q.answers[index];
+        // This structure ensures .fill-bar is first for z-index and .answer-text is on top
+        btn.innerHTML = `<div class="fill-bar" style="width:0%;"></div><span class="answer-text">${answerText}</span>`;
       });
-    
+
       document.getElementById("hint-box").style.display = "none";
       selectedButton = null;
-    }
 
+      if (window.MathJax) {
+        MathJax.typesetPromise().catch(function(err){console.error('MathJax typesetPromise failed:', err);});
+      }
+    }
 
     function selectAnswer(button) {
       const buttons = document.querySelectorAll("#answer-buttons button");
@@ -550,154 +692,193 @@
 
     function checkAnswer() {
       if (!selectedButton) return;
-    
-      const selectedText = selectedButton.innerText;
-      const correctText = questions[currentQuestion].correct;
-    
-      if (selectedText === correctText) {
-        // Add correct class to current question box in tracker
+
+      const selectedIndex = parseInt(selectedButton.getAttribute("data-index"), 10);
+      const q = questionsArray[currentQuestionIndex];
+      const correctIdx = q.correctIndex;
+
+      if (selectedIndex === correctIdx) {
         const trackerBoxes = document.getElementById("progress-tracker").children;
-        trackerBoxes[currentQuestion].classList.add("correct");
-        correctAnswers++;
-    
-        currentQuestion++;
-        if (currentQuestion < questions.length) {
+        trackerBoxes[currentQuestionIndex].classList.add("correct");
+        correctAnswersCount++;
+
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questionsArray.length) {
           showQuestion();
         } else {
-          // All questions answered correctly
-          showResult(`Congrats! You answered all ${correctAnswers} questions correctly!`);
+          showResult(true); // Game won
         }
       } else {
-        // Wrong answer - end game immediately
-        showResult(`Wrong answer! You got ${correctAnswers} right.<br>Correct answer: ${correctText}`);
+        // Pass the actual correct answer string (with LaTeX if applicable)
+        showResult(false, q.answers[correctIdx]);
       }
     }
-    
-    function showResult(message) {
-      document.getElementById("quiz-container").style.display = "none";
-      document.getElementById("result-screen").style.display = "flex";
-      document.getElementById("progress-tracker").style.display = "none";
 
-    
-      // If a custom message passed, show it, else fallback to default
-      if (message) {
-        document.getElementById("final-score-text").innerHTML = message;
-      } else {
-        document.getElementById("final-score-text").innerText =
-          `You answered ${correctAnswers} out of ${questions.length} questions correctly!`;
-      }
+    function showResult(isWin, correctAnswerText) {
+        document.getElementById("quiz-container").style.display = "none";
+        document.getElementById("result-screen").style.display = "flex";
+        document.getElementById("progress-tracker").style.display = "none";
+
+        const scoreLevelImageEl = document.getElementById("score-level-image");
+        const correctAnswerDisplayEl = document.getElementById("correct-answer-text-result");
+
+        correctAnswerDisplayEl.innerHTML = ""; // Clear previous
+
+        if (isWin) {
+            scoreLevelImageEl.src = scoreImages[scoreImages.length - 1]; // Assuming 5th image is for all correct
+            scoreLevelImageEl.alt = `Congratulations! You answered all ${questionsArray.length} questions correctly!`;
+        } else {
+            if (correctAnswersCount > 0 && correctAnswersCount <= scoreImages.length) {
+                scoreLevelImageEl.src = scoreImages[correctAnswersCount - 1];
+            } else { // 0 correct answers
+                scoreLevelImageEl.src = scoreImages[0]; // Or a specific "0 score" image if you have one
+            }
+            scoreLevelImageEl.alt = `You answered ${correctAnswersCount} out of ${questionsArray.length} correctly.`;
+
+            if (correctAnswerText) {
+                 correctAnswerDisplayEl.innerHTML = `The correct answer was: <strong>${correctAnswerText}</strong>`;
+                 if (window.MathJax) {
+                    MathJax.typesetPromise([correctAnswerDisplayEl]).catch(function (err) { console.error(err.message); });
+                 }
+            }
+        }
+        scoreLevelImageEl.style.display = "block";
     }
-    
+
     function restartGame() {
-      // Reset lifelines
-      document.getElementById("fifty-btn").parentElement.removeAttribute("disabled");
-      document.getElementById("audience-btn").parentElement.removeAttribute("disabled");
-      document.getElementById("phone-btn").parentElement.removeAttribute("disabled");
-    
-      // Reset counters
-      currentQuestion = 0;
-      correctAnswers = 0;
-    
-      // Clear tracker
-      document.getElementById("progress-tracker").innerHTML = '';
-    
-      // Show start screen, hide others
       document.getElementById("start-screen").style.display = "flex";
       document.getElementById("quiz-container").style.display = "none";
       document.getElementById("result-screen").style.display = "none";
+      // No need to show progress tracker on start screen, startGame will handle it.
+
+      // Lifelines and answer buttons are reset within startGame when it's called again.
+      // This function's main job is to show the start screen.
     }
 
-  function createTracker() {
-    const tracker = document.getElementById("progress-tracker");
-    tracker.innerHTML = '';
-    for (let i = 0; i < questions.length; i++) {
-      const box = document.createElement("div");
-      box.innerText = i + 1;
-      tracker.appendChild(box);
+    function createTracker() {
+      const tracker = document.getElementById("progress-tracker");
+      tracker.innerHTML = '';
+      tracker.style.display = "flex";
+      for (let i = 0; i < questionsArray.length; i++) {
+        const box = document.createElement("div");
+        box.innerText = i + 1;
+        tracker.appendChild(box);
+      }
     }
-  }
-
-
 
     function useFiftyFifty() {
+      const fiftyFiftyLifeline = document.getElementById("fifty-btn").parentElement;
+      if (fiftyFiftyLifeline.hasAttribute("disabled")) return;
+      fiftyFiftyLifeline.setAttribute("disabled", true);
 
-      // Disable the 50/50 lifeline button visually and functionally
-      const fiftyBtn = document.getElementById("fifty-btn").parentElement;
-      fiftyBtn.setAttribute("disabled", true);
-    
-      // Hide two incorrect answers
-      const q = questions[currentQuestion];
+      const q = questionsArray[currentQuestionIndex];
       const buttons = Array.from(document.querySelectorAll("#answer-buttons button"));
-    
-      // Find all incorrect buttons
-      const incorrectButtons = buttons.filter(btn => btn.innerText !== q.correct);
-    
-      // Randomly pick 2 incorrect answers to hide
+      const incorrectButtonsIndices = [];
+
+      buttons.forEach((btn, index) => {
+        if (index !== q.correctIndex) {
+          incorrectButtonsIndices.push(index);
+        }
+      });
+
+      // Shuffle incorrect indices and pick two to hide
+      for (let i = incorrectButtonsIndices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [incorrectButtonsIndices[i], incorrectButtonsIndices[j]] = [incorrectButtonsIndices[j], incorrectButtonsIndices[i]];
+      }
+
       let hiddenCount = 0;
-      while (hiddenCount < 2 && incorrectButtons.length > 0) {
-        // Random index from incorrectButtons array
-        const randIndex = Math.floor(Math.random() * incorrectButtons.length);
-        const btnToHide = incorrectButtons[randIndex];
-        btnToHide.classList.add("hidden");
-        btnToHide.disabled = true;
-    
-        // Remove the hidden button from array so we don't hide it twice
-        incorrectButtons.splice(randIndex, 1);
-        hiddenCount++;
+      for (let i = 0; i < incorrectButtonsIndices.length && hiddenCount < 2; i++) {
+        const btnToHide = buttons[incorrectButtonsIndices[i]];
+        if (!btnToHide.classList.contains("hidden")) {
+            btnToHide.classList.add("hidden");
+            btnToHide.disabled = true;
+            hiddenCount++;
+        }
       }
     }
 
     function askAudience() {
-      const q = questions[currentQuestion];
-      const correct = q.correct;
-      const buttons = Array.from(document.querySelectorAll("#answer-buttons button"));
-    
-      // Generate initial random percentages
-      let votes = buttons.map(btn => ({
-        text: btn.innerText,
-        percent: btn.innerText === correct ? getRandomInt(50, 80) : getRandomInt(5, 20)
-      }));
-    
-      // Normalize so total = 100%
-      let total = votes.reduce((sum, v) => sum + v.percent, 0);
-      votes = votes.map(v => ({...v, percent: Math.round((v.percent / total) * 100)}));
-    
-      // Animate fill bars smoothly
-      votes.forEach((vote, i) => {
-        const btn = buttons[i];
-        let fillBar = btn.querySelector(".fill-bar");
-        if (!fillBar) {
-          fillBar = document.createElement("div");
-          fillBar.classList.add("fill-bar");
-          btn.prepend(fillBar);
+        const audienceLifeline = document.getElementById("audience-btn").parentElement;
+        if (audienceLifeline.hasAttribute("disabled")) return;
+        audienceLifeline.setAttribute("disabled", true);
+
+        const q = questionsArray[currentQuestionIndex];
+        const correctIdx = q.correctIndex;
+        const buttons = Array.from(document.querySelectorAll("#answer-buttons button"));
+        let votes = [];
+        let totalPercentage = 0;
+
+        buttons.forEach((btn, index) => {
+            if (btn.classList.contains("hidden")) { // Skip hidden buttons
+                votes.push({ button: btn, percent: 0 });
+                return;
+            }
+            const isCorrect = (index === correctIdx);
+            let percentage;
+            if (isCorrect) {
+                percentage = getRandomInt(40, 70);
+            } else {
+                percentage = getRandomInt(5, 20);
+            }
+            votes.push({ button: btn, percent: percentage });
+            totalPercentage += percentage;
+        });
+
+        // Normalize for visible buttons
+        let normalizedTotal = 0;
+        const visibleVotes = votes.filter(v => !v.button.classList.contains("hidden") && v.percent > 0);
+
+        if (totalPercentage === 0 && visibleVotes.length > 0) { // If all were 0, distribute somewhat
+             let evenDist = Math.floor(100 / visibleVotes.length);
+             visibleVotes.forEach(v => v.percent = evenDist);
+             totalPercentage = visibleVotes.reduce((sum, v) => sum + v.percent, 0);
         }
-        // Reset width first to trigger transition
-        fillBar.style.width = '0';
-        // Force reflow for transition restart
-        void fillBar.offsetWidth;
-        // Then set to vote percent
-        fillBar.style.width = vote.percent + "%";
-      });
-    
-      // Disable lifeline visually and functionally
-      const audienceBtn = document.getElementById("audience-btn").parentElement;
-      audienceBtn.setAttribute("disabled", true);
+
+
+        visibleVotes.forEach(vote => {
+            vote.percent = Math.round((vote.percent / totalPercentage) * 100);
+            normalizedTotal += vote.percent;
+        });
+
+        let diff = 100 - normalizedTotal;
+        if (diff !== 0 && visibleVotes.length > 0) {
+            let adjustIndex = visibleVotes.findIndex(v => parseInt(v.button.getAttribute('data-index')) === correctIdx);
+            if (adjustIndex === -1) adjustIndex = 0; // Fallback to first visible
+            if (visibleVotes[adjustIndex]) { // Make sure it exists
+                 visibleVotes[adjustIndex].percent += diff;
+            } else if (visibleVotes.length > 0) { // if correct was hidden, add to first visible
+                 visibleVotes[0].percent += diff;
+            }
+        }
+        
+        votes.forEach(vote => {
+            if (vote.button.classList.contains("hidden")) return;
+
+            let fillBar = vote.button.querySelector(".fill-bar");
+            fillBar.style.width = '0%';
+            void fillBar.offsetWidth;
+            setTimeout(() => {
+                fillBar.style.width = vote.percent + "%";
+            }, 50);
+        });
     }
 
     function phoneFriend() {
-      const hint = questions[currentQuestion].hint;
+      const phoneLifeline = document.getElementById("phone-btn").parentElement;
+      if (phoneLifeline.hasAttribute("disabled")) return;
+      phoneLifeline.setAttribute("disabled", true);
+
+      const hint = questionsArray[currentQuestionIndex].hint;
       const hintBox = document.getElementById("hint-box");
-      hintBox.innerText = "Jimmy says: " + hint;
+      hintBox.innerHTML = "Jimmy says: " + hint; // Use innerHTML in case hint has HTML (like <sup>)
       hintBox.style.display = "block";
-    
-      // Disable lifeline visually and functionally
-      const phoneBtn = document.getElementById("phone-btn").parentElement;
-      phoneBtn.setAttribute("disabled", true);
     }
 
     function getRandomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-  </script>
+</script>
+
 </body>
 </html>
