@@ -361,8 +361,9 @@
 
     #correct-answer-text-result { /* Renamed to avoid conflict */
         font-weight: bold;
-        margin-top: 1em; /* Spacing above text */
-        margin-bottom: 1em; /* Spacing below text */
+        font-size: 1.7rem;
+        margin-top: 0.3em; /* Spacing above text */
+        margin-bottom: 0.2em; /* Spacing below text */
         padding: 0 1em; /* Add some horizontal padding */
     }
 
@@ -373,6 +374,9 @@
     <h1>Who Wants to Get a Five?</h1>
     <button onclick="startGame()">Start Game</button>
   </div>
+
+  <div id="timer" style="text-align:center; font-size:24px; font-weight:bold; margin-top:20px;"></div>
+
 
   <div class="container" id="quiz-container" style="display: none;">
     <div class="lifelines">
@@ -410,17 +414,19 @@
            class="result-banner-img" />
 
       <img id="score-level-image" src="" alt="Score Level" class="score-level-img" />
-
-      <h2>Thank You for taking the Blue Book Digital AP Exam. Please Rate Your Experience</h2>
       <p id="correct-answer-text-result"></p>
+      <h2>Thank You for taking the Ms.Hanafi Digital BC Exam. Please Study For Your Next Test :))</h2>
+      <p >made with love form previous calc students <3</p>
       <button onclick="restartGame()">Play Again</button> </div>
+      
 
 
   <div class="tracker" id="progress-tracker"></div>
 
   <script>
     const categories = {
-      sports: [ // This category already uses correctIndex and LaTeX
+      sports:
+      [ // This category already uses correctIndex and LaTeX
         {
           question: "\\[ \\int \\frac{x^{2}+4}{x^{2}}\\,dx \\]",
           answers: [
@@ -430,7 +436,8 @@
             "\\( x - \\frac{4}{x} + C \\)"
           ],
           correctIndex: 3,
-          hint: "Simplify the integrand first: 1 + 4x<sup>-2</sup>"
+          hint: "Simplify the integrand first: 1 + 4x<sup>-2</sup>",
+          time: 60
         },
         {
           question: "\\[ \\int \\cos(3x)\\,dx \\]",
@@ -441,7 +448,8 @@
             "\\( -\\frac{1}{3}\\sin(3x) + C \\)"
           ],
           correctIndex: 0,
-          hint: "Use u-substitution with u = 3x."
+          hint: "Use u-substitution with u = 3x.",
+          time: 60
         },
         {
           question: "\\[ \\int \\left( \\frac{8}{x} - \\frac{5}{x^{2}} + \\frac{6}{x^{3}} \\right) dx \\]",
@@ -453,7 +461,8 @@
           ],
           
           correctIndex: 0, // Corrected based on calculation
-          hint: "Rewrite terms with negative exponents (e.g., 1/x<sup>n</sup> = x<sup>-n</sup>) and integrate term by term."
+          hint: "Rewrite terms with negative exponents (e.g., 1/x<sup>n</sup> = x<sup>-n</sup>) and integrate term by term.",
+          time: 60
         }
       ],
 
@@ -468,7 +477,8 @@
             "\\( \\frac{1}{4}\\left (3x^4+4  \\right )^{4} \\)"                             // Incorrect (missing +c)
           ],
           correctIndex: 1,
-          hint: "Try substitution: let \\( u = 3x^2 + 4 \\), then integrate using the chain rule."
+          hint: "Try substitution: let \\( u = 3x^2 + 4 \\), then integrate using the chain rule.",
+          time: 75
         },
         {
           question: "\\[ \\int_{0}^{\\frac{\\pi}{2}} e^{\\cos x} \\cdot \\sin(x) \\, dx \\]",
@@ -479,7 +489,8 @@
             "\\( e - 2 \\)"       // Incorrect
           ],
           correctIndex: 2,
-          hint: "Let \\( u = \\cos(x) \\). Adjust bounds accordingly and use substitution."
+          hint: "Let \\( u = \\cos(x) \\). Adjust bounds accordingly and use substitution.",
+          time: 75
         },
         {
           question: "\\[ \\int \\frac{e^{x}}{e^{x}+1} \\, dx \\]",
@@ -490,7 +501,8 @@
             "\\( \\ln|e^{x}+1| \\)"            // Incorrect (missing +c)
           ],
           correctIndex: 2,
-          hint: "Try substitution: let \\( u = e^x + 1 \\)."
+          hint: "Try substitution: let \\( u = e^x + 1 \\).",
+          time: 75
         }
       ],
 
@@ -505,7 +517,8 @@
             "\\( x^{2}\\sin(x) + 2\\cos(x) + 2\\sin(x) + c \\)"         // Incorrect
           ],
           correctIndex: 1,
-          hint: "Use integration by parts twice. Let \\( u = x^2 \\) and \\( dv = \\cos(x)dx \\)."
+          hint: "Use integration by parts twice. Let \\( u = x^2 \\) and \\( dv = \\cos(x)dx \\).",
+          time: 90
         },
         {
           question: "\\[ \\int e^{x} \\cdot \\sin(x) \\, dx \\]",
@@ -516,7 +529,8 @@
             "\\( \\frac{1}{2}e^{x}\\left ( \\sin(x)-\\cos(x) \\right ) + c \\)"       // ✅ Correct
           ],
           correctIndex: 3,
-          hint: "Use integration by parts twice or solve the associated second-order differential equation."
+          hint: "Use integration by parts twice or solve the associated second-order differential equation.",
+          time: 90
         },
         {
           question: "\\[ \\int_{1}^{\\infty} \\frac{\\ln|x|}{x^7} \\, dx \\]",
@@ -527,7 +541,8 @@
             "\\( \\frac{1}{18} \\)"    // Incorrect
           ],
           correctIndex: 0,
-          hint: "Use integration by parts with \\( u = \\ln x \\), \\( dv = x^{-7} dx \\)."
+          hint: "Use integration by parts with \\( u = \\ln x \\), \\( dv = x^{-7} dx \\).",
+          time: 90
         }
       ],
 
@@ -542,7 +557,8 @@
             "\\( -\\frac{1}{6}\\cos^{6}(x) \\cdot \\sin^{2}(x) + c \\)"                                    // Incorrect
           ],
           correctIndex: 2,
-          hint: "Use the identity \\( \\sin^3(x) = (1 - \\cos^2(x)) \\cdot \\sin(x) \\), then substitute \\( u = \\cos(x) \\)."
+          hint: "Use the identity \\( \\sin^3(x) = (1 - \\cos^2(x)) \\cdot \\sin(x) \\), then substitute \\( u = \\cos(x) \\).",
+          time: 105
         },
         {
           question: "\\[ \\int \\frac{1}{a^{2} + b^{2}x^{2}} \\, dx \\]",
@@ -553,7 +569,8 @@
             "\\( \\frac{a}{b} \\arctan\\left( \\frac{b}{a}x \\right) + c \\)"       // Incorrect
           ],
           correctIndex: 1,
-          hint: "Use the standard form: \\( \\int \\frac{1}{a^2 + u^2} \\, du = \\frac{1}{a} \\arctan\\left( \\frac{u}{a} \\right) + C \\)"
+          hint: "Use the standard form: \\( \\int \\frac{1}{a^2 + u^2} \\, du = \\frac{1}{a} \\arctan\\left( \\frac{u}{a} \\right) + C \\)",
+          time: 105
         },
         {
           question: "\\[ \\int \\cos(11m) \\cdot \\sin(3m) \\, dm \\]",
@@ -564,7 +581,8 @@
             "\\( \\frac{1}{16}\\cos(8m) - \\frac{1}{28}\\cos(14m) + c \\)"        // ✅ Correct
           ],
           correctIndex: 3,
-          hint: "Use product-to-sum identities: \\( \\cos(A)\\sin(B) = \\frac{1}{2}[\\sin(A+B) - \\sin(A-B)] \\), then integrate."
+          hint: "Use product-to-sum identities: \\( \\cos(A)\\sin(B) = \\frac{1}{2}[\\sin(A+B) - \\sin(A-B)] \\), then integrate.",
+          time: 105
         }
       ],
       school: [ // Updated to use correctIndex
@@ -577,7 +595,8 @@
             "\\( \\frac{2}{9}w^{2} + \\frac{83}{18}\\ln|w| - \\frac{1}{2}\\ln|w^{2} + 9| + c \\)"         // Incorrect
           ],
           correctIndex: 0,
-          hint: "Use polynomial long division first, then partial fraction decomposition on the rational part."
+          hint: "Use polynomial long division first, then partial fraction decomposition on the rational part.",
+          time: 120
 
         },
         {
@@ -589,7 +608,8 @@
             "\\( \\frac{4}{\\pi} \\)"       // Incorrect
           ],
           correctIndex: 1,
-          hint: "Use integration by parts twice. Let \\( u = x^2 \\), then \\( dv = \\cos(4x)dx \\)."
+          hint: "Use integration by parts twice. Let \\( u = x^2 \\), then \\( dv = \\cos(4x)dx \\).",
+          time: 120
         },
         {
           question: "\\[ \\int \\frac{-2x + 4}{x^{3} - x^{2} + x - 1} \\, dx \\]",
@@ -600,7 +620,8 @@
             "\\( \\ln|x^{2}+1| - \\arctan(x) + 2\\ln|x + 1| + c \\)"                        // Incorrect
           ],
           correctIndex: 2,
-          hint: "Factor the denominator and use partial fractions. Some terms may involve \\( \\arctan(x) \\) and logarithms."
+          hint: "Factor the denominator and use partial fractions. Some terms may involve \\( \\arctan(x) \\) and logarithms.",
+          time: 120
         }
       ]
     };
@@ -613,6 +634,37 @@
         "https://raw.githubusercontent.com/rshortbull/plsmshaniafigivemeanaincalc/refs/heads/main/newscore5.png"  // For 5 correct
     ];
 
+    let countdownInterval;
+    let remainingTime = 0;
+
+    function startTimerForCategory(categoryName) {
+      const timerEl = document.getElementById("timer");
+      clearInterval(countdownInterval); // Clear any previous timers
+
+      remainingTime = categories[categoryName][currentQuestionIndex].time;
+      updateTimerDisplay();
+
+      countdownInterval = setInterval(() => {
+        remainingTime--;
+        updateTimerDisplay();
+
+        if (remainingTime <= 0) {
+          clearInterval(countdownInterval);
+          const q = questionsArray[currentQuestionIndex];
+          showResult(false, q.answers[q.correctIndex]); // Act like wrong answer
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const timerEl = document.getElementById("timer");
+      const minutes = Math.floor(remainingTime / 60);
+      const seconds = remainingTime % 60;
+      timerEl.textContent = `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+
+    }
+
+
 
     let currentQuestionIndex = 0; // Renamed from currentQuestion to avoid confusion with question object
     let selectedButton = null;
@@ -620,13 +672,13 @@
     let questionsArray = []; // Renamed from questions
 
     function selectQuestions() {
-      questionsArray = [
-        getRandomQuestion(categories.sports),
-        getRandomQuestion(categories.cars),
-        getRandomQuestion(categories.math),
-        getRandomQuestion(categories.animals),
-        getRandomQuestion(categories.school)
-      ];
+      questionsArray = [];
+
+      for (const [categoryName, questions] of Object.entries(categories)) {
+        const question = getRandomQuestion(questions);
+        question.category = categoryName;
+        questionsArray.push(question);
+      }
     }
 
     function getRandomQuestion(categoryArray) {
@@ -681,6 +733,8 @@
       if (window.MathJax) {
         MathJax.typesetPromise().catch(function(err){console.error('MathJax typesetPromise failed:', err);});
       }
+
+      startTimerForCategory(q.category);
     }
 
     function selectAnswer(button) {
@@ -701,6 +755,8 @@
         const trackerBoxes = document.getElementById("progress-tracker").children;
         trackerBoxes[currentQuestionIndex].classList.add("correct");
         correctAnswersCount++;
+      
+        clearInterval(countdownInterval);
 
         currentQuestionIndex++;
         if (currentQuestionIndex < questionsArray.length) {
@@ -712,6 +768,8 @@
         // Pass the actual correct answer string (with LaTeX if applicable)
         showResult(false, q.answers[correctIdx]);
       }
+
+
     }
 
     function showResult(isWin, correctAnswerText) {
